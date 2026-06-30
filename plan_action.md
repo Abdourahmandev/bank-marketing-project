@@ -397,7 +397,7 @@ Limites attendues : coût de prédiction sur 41 188 lignes, sensibilité à l'é
 
 - [x] P1.1 Télécharger l'archive officielle hors Databricks.
 - [x] P1.2 Vérifier le fichier, sa taille et son empreinte SHA-256.
-- [ ] P1.3 Conserver le CSV brut sans modification dans `data/raw/`.
+- [x] P1.3 Conserver le CSV brut sans modification dans `data/raw/`.
 - [ ] P1.4 Ajouter le CSV à DVC.
 - [x] P1.5 Documenter la source, licence, citation et empreinte dans un manifeste.
 - [ ] P1.6 Téléverser le CSV dans un Unity Catalog Volume.

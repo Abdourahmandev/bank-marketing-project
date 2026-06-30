@@ -43,6 +43,14 @@ Fichier attendu :
 bank-additional-full.csv
 ```
 
+Une copie officielle déjà vérifiée est disponible sur ce poste dans :
+
+```text
+C:\Users\User\Downloads\420-C74-20260630T221457Z-3-001\bank-marketing-project\data\raw\bank-additional-full.csv
+```
+
+Ce fichier est volontairement ignoré par Git.
+
 Empreinte SHA-256 attendue :
 
 ```text
@@ -113,4 +121,3 @@ Les premiers résultats attendus sont :
 - MLflow contiendra les paramètres, métriques, figures et modèles.
 - Le test final ne sera pas consulté pendant le réglage.
 - Les sorties critiques seront sauvegardées, car Free Edition est soumise à des quotas.
-

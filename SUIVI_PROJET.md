@@ -39,6 +39,7 @@ Il doit être mis à jour après chaque séance de travail importante. Le plan c
 | arborescence initiale | TERMINÉ | dossiers de données, notebooks, code, modèles, rapports, tests et présentation |
 | configuration Databricks | TERMINÉ | notebook de configuration Unity Catalog ajouté |
 | manifeste du dataset | TERMINÉ | taille, SHA-256, schéma et comptes de référence ajoutés |
+| CSV brut local | TERMINÉ | copie officielle vérifiée dans `data/raw/`, ignorée par Git |
 | ingestion Bronze | EN COURS | notebook prêt ; téléversement et exécution requis dans Databricks |
 | environnement Python | EN COURS | compute serverless retenu ; bibliothèques à valider dans le workspace |
 | acquisition avec DVC | À FAIRE | fichier officiel pas encore ajouté au dépôt de projet |
@@ -176,6 +177,7 @@ ni rendre le projet dépendant de fonctions payantes.
 - création du notebook initial `02_eda.py` ;
 - création d'un guide de configuration Databricks ;
 - adaptation du plan et du journal à Unity Catalog, Delta Lake et MLflow géré.
+- copie du CSV officiel vérifié dans `data/raw/bank-additional-full.csv` pour le téléversement manuel ;
 - publication du commit `prepare Databricks foundation` sur une branche dédiée ;
 - ouverture de la pull request brouillon GitHub #1 vers `main`.
 
@@ -413,7 +415,7 @@ Relire et fusionner la pull request #1, tirer `main` dans le Git Folder, exécut
 2. `À FAIRE` Relire et fusionner la pull request #1 dans `main`.
 3. `À FAIRE` Tirer `main` dans le Databricks Git Folder.
 4. `À FAIRE` Exécuter `00_configuration.py` sur compute serverless.
-5. `À FAIRE` Téléverser le CSV officiel dans le Volume affiché.
+5. `À FAIRE` Téléverser `data/raw/bank-additional-full.csv` dans le Volume affiché.
 6. `À FAIRE` Exécuter et valider `01_ingestion_bronze.py`.
 7. `À FAIRE` Exécuter `02_eda.py` et conserver les premières observations.
 8. `À FAIRE` Initialiser DVC côté local pour la provenance du fichier.
