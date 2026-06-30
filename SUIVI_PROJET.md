@@ -33,6 +33,7 @@ Il doit être mis à jour après chaque séance de travail importante. Le plan c
 | push initial GitHub | TERMINÉ | identité corrigée avec l'adresse GitHub privée `noreply` |
 | GitHub App Databricks | TERMINÉ | autorisation et accès au dépôt confirmés par l'étudiant |
 | Databricks Git Folder | TERMINÉ | dépôt visible et synchronisable dans le workspace |
+| fondation Databricks publiée | EN COURS | branche `codex/databricks-foundation` publiée ; PR #1 à fusionner dans `main` |
 | planification | TERMINÉ | `plan_action.md` créé |
 | journal de suivi | TERMINÉ | présent fichier créé |
 | arborescence initiale | TERMINÉ | dossiers de données, notebooks, code, modèles, rapports, tests et présentation |
@@ -175,6 +176,8 @@ ni rendre le projet dépendant de fonctions payantes.
 - création du notebook initial `02_eda.py` ;
 - création d'un guide de configuration Databricks ;
 - adaptation du plan et du journal à Unity Catalog, Delta Lake et MLflow géré.
+- publication du commit `prepare Databricks foundation` sur une branche dédiée ;
+- ouverture de la pull request brouillon GitHub #1 vers `main`.
 
 #### Résultats et preuves
 
@@ -196,8 +199,8 @@ ni rendre le projet dépendant de fonctions payantes.
 
 #### Prochaine action exacte
 
-Synchroniser ces fichiers sur GitHub, tirer les changements dans le Git Folder,
-exécuter `00_configuration.py`, téléverser le CSV dans le Volume, puis exécuter
+Relire et fusionner la pull request #1, tirer `main` dans le Git Folder, exécuter
+`00_configuration.py`, téléverser le CSV dans le Volume, puis exécuter
 `01_ingestion_bronze.py` et `02_eda.py`.
 
 ---
@@ -406,14 +409,15 @@ exécuter `00_configuration.py`, téléverser le CSV dans le Volume, puis exécu
 
 ### Prochaine étape immédiate
 
-1. `À FAIRE` Publier les fichiers Databricks préparés sur GitHub.
-2. `À FAIRE` Tirer `main` dans le Databricks Git Folder.
-3. `À FAIRE` Exécuter `00_configuration.py` sur compute serverless.
-4. `À FAIRE` Téléverser le CSV officiel dans le Volume affiché.
-5. `À FAIRE` Exécuter et valider `01_ingestion_bronze.py`.
-6. `À FAIRE` Exécuter `02_eda.py` et conserver les premières observations.
-7. `À FAIRE` Initialiser DVC côté local pour la provenance du fichier.
-8. `À FAIRE` Valider les bibliothèques disponibles dans le compute serverless.
+1. `TERMINÉ` Publier les fichiers Databricks préparés sur GitHub dans la branche `codex/databricks-foundation`.
+2. `À FAIRE` Relire et fusionner la pull request #1 dans `main`.
+3. `À FAIRE` Tirer `main` dans le Databricks Git Folder.
+4. `À FAIRE` Exécuter `00_configuration.py` sur compute serverless.
+5. `À FAIRE` Téléverser le CSV officiel dans le Volume affiché.
+6. `À FAIRE` Exécuter et valider `01_ingestion_bronze.py`.
+7. `À FAIRE` Exécuter `02_eda.py` et conserver les premières observations.
+8. `À FAIRE` Initialiser DVC côté local pour la provenance du fichier.
+9. `À FAIRE` Valider les bibliothèques disponibles dans le compute serverless.
 
 ### Acquisition et validation du schéma
 
@@ -496,9 +500,10 @@ exécuter `00_configuration.py`, téléverser le CSV dans le Volume, puis exécu
 
 ## 7. Blocages actuels
 
-Le seul point nécessitant une action manuelle est le téléversement du CSV dans
-le Unity Catalog Volume. Les notebooks ne peuvent pas contourner cette étape de
-façon fiable dans Free Edition à cause de l'accès Internet sortant restreint.
+Deux actions manuelles demeurent : fusionner la pull request #1, puis téléverser
+le CSV dans le Unity Catalog Volume. Les notebooks ne peuvent pas contourner le
+téléversement de façon fiable dans Free Edition à cause de l'accès Internet
+sortant restreint.
 
 Éléments à surveiller :
 
@@ -574,7 +579,7 @@ Chaque nouvelle séance utilisera ce modèle :
 
 ## 10. Prochaine action exacte
 
-La prochaine séance doit commencer dans Databricks : tirer `main`, exécuter le
-notebook de configuration, téléverser le CSV officiel, créer la table Bronze et
-exécuter l'EDA initiale. Aucun notebook de modèle ne doit être commencé avant que
-ces contrôles réussissent.
+La prochaine séance doit commencer par fusionner la pull request #1. Ensuite,
+dans Databricks : tirer `main`, exécuter le notebook de configuration, téléverser
+le CSV officiel, créer la table Bronze et exécuter l'EDA initiale. Aucun notebook
+de modèle ne doit être commencé avant que ces contrôles réussissent.
