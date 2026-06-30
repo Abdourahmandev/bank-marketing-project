@@ -1,0 +1,53 @@
+{
+  "dataset_name": "Bank Marketing",
+  "variant": "bank-additional-full.csv",
+  "source_page": "https://archive.ics.uci.edu/dataset/222/bank",
+  "download_url": "https://archive.ics.uci.edu/static/public/222/bank+marketing.zip",
+  "doi": "10.24432/C5K306",
+  "license": "CC BY 4.0",
+  "authors": [
+    "Sergio Moro",
+    "Paulo Cortez",
+    "Paulo Rita"
+  ],
+  "file_size_bytes": 5834924,
+  "sha256": "74adfc578bf77a7ff4bb1ba4a9f8709d9e3c6907342959c2c8416847e0afb4d8",
+  "separator": ";",
+  "expected_rows": 41188,
+  "expected_columns": 21,
+  "expected_exact_duplicates": 12,
+  "target_column": "y",
+  "positive_class": "yes",
+  "expected_target_counts": {
+    "no": 36548,
+    "yes": 4640
+  },
+  "ordered_by_date": true,
+  "date_range": "May 2008 to November 2010",
+  "deployment_excluded_columns": [
+    "duration"
+  ],
+  "columns": [
+    "age",
+    "job",
+    "marital",
+    "education",
+    "default",
+    "housing",
+    "loan",
+    "contact",
+    "month",
+    "day_of_week",
+    "duration",
+    "campaign",
+    "pdays",
+    "previous",
+    "poutcome",
+    "emp.var.rate",
+    "cons.price.idx",
+    "cons.conf.idx",
+    "euribor3m",
+    "nr.employed",
+    "y"
+  ]
+}
