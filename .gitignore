@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environnements et configuration locale
+.venv/
+venv/
+.env
+.env.*
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE et système
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Données volumineuses ou générées. Les fichiers *.dvc restent visibles pour Git.
+data/raw/*.csv
+data/raw/*.zip
+data/interim/*.csv
+data/interim/*.parquet
+data/processed/*.csv
+data/processed/*.parquet
+
+# Modèles et expériences locales. Les fichiers *.dvc restent visibles pour Git.
+models/*.joblib
+models/*.pkl
+mlruns/
+artifacts/
+mlflow.db
+
+# Rapports générés volumineux
+reports/*.html
+
+# Couverture et construction
+.coverage
+htmlcov/
+build/
+dist/
