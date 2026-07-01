@@ -34,6 +34,7 @@ encore disponible.
 
 ## Documentation de travail
 
+- [Wiki du projet pour débutants](wiki/README.md)
 - [Plan d'action détaillé](plan_action.md)
 - [Journal de suivi et registre des décisions](SUIVI_PROJET.md)
 - [Configuration Databricks](docs/databricks_setup.md)
