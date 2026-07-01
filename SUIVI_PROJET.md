@@ -22,7 +22,7 @@ Il doit être mis à jour après chaque séance de travail importante. Le plan c
 
 ---
 
-## 2. État global au 30 juin 2026
+## 2. État global au 1er juillet 2026
 
 | Élément | État | Commentaire |
 |---|---|---|
@@ -33,26 +33,26 @@ Il doit être mis à jour après chaque séance de travail importante. Le plan c
 | push initial GitHub | TERMINÉ | identité corrigée avec l'adresse GitHub privée `noreply` |
 | GitHub App Databricks | TERMINÉ | autorisation et accès au dépôt confirmés par l'étudiant |
 | Databricks Git Folder | TERMINÉ | dépôt visible et synchronisable dans le workspace |
-| fondation Databricks publiée | EN COURS | branche `codex/databricks-foundation` publiée ; PR #1 à fusionner dans `main` |
+| fondation Databricks publiée | TERMINÉ | PR #1 fusionnée dans `main` |
 | planification | TERMINÉ | `plan_action.md` créé |
 | journal de suivi | TERMINÉ | présent fichier créé |
 | arborescence initiale | TERMINÉ | dossiers de données, notebooks, code, modèles, rapports, tests et présentation |
 | configuration Databricks | TERMINÉ | notebook de configuration Unity Catalog ajouté |
 | manifeste du dataset | TERMINÉ | taille, SHA-256, schéma et comptes de référence ajoutés |
 | CSV brut local | TERMINÉ | copie officielle vérifiée dans `data/raw/`, ignorée par Git |
-| ingestion Bronze | EN COURS | notebook prêt ; téléversement et exécution requis dans Databricks |
+| ingestion Bronze | TERMINÉ | CSV téléversé et notebook exécuté par l'étudiant |
 | environnement Python | EN COURS | compute serverless retenu ; bibliothèques à valider dans le workspace |
 | acquisition avec DVC | À FAIRE | fichier officiel pas encore ajouté au dépôt de projet |
-| EDA | EN COURS | notebook Databricks initial ajouté ; exécution après création Bronze |
-| prétraitement | À FAIRE | décisions principales planifiées, non implémentées |
+| EDA | EN COURS | notebook initial exécuté ; analyses avancées et export des figures restent à faire |
+| prétraitement | EN COURS | transformations Silver et tests préparés ; exécution Databricks requise |
 | modélisation | À FAIRE | aucun modèle entraîné dans le dépôt |
 | MLflow | À FAIRE | MLflow Databricks géré ; autologging serverless à activer explicitement |
 | évaluation finale | À FAIRE | aucun résultat ne doit être annoncé avant exécution |
 | présentation | À FAIRE | plan temporel défini, PowerPoint non créé |
 
-Estimation prudente de l'avancement total : **environ 15 %**. L'architecture et
-l'ingestion sont préparées, mais elles doivent encore être exécutées dans le
-workspace avant de commencer les décisions de prétraitement.
+Estimation prudente de l'avancement total : **environ 30 %**. L'architecture,
+l'ingestion et l'EDA initiale fonctionnent ; la table Silver doit maintenant être
+exécutée avant de commencer les modèles de référence.
 
 ---
 
@@ -204,6 +204,59 @@ ni rendre le projet dépendant de fonctions payantes.
 Relire et fusionner la pull request #1, tirer `main` dans le Git Folder, exécuter
 `00_configuration.py`, téléverser le CSV dans le Volume, puis exécuter
 `01_ingestion_bronze.py` et `02_eda.py`.
+
+### Séance du 1er juillet 2026 — Exécution Bronze/EDA et préparation Silver
+
+#### Objectif
+
+Transformer les données contrôlées en un jeu modélisable, sans apprendre de
+paramètres sur la validation ou le test.
+
+#### Actions effectuées
+
+- fusion de la pull request #1 et synchronisation de `main` ;
+- correction par l'étudiant de la création du sous-dossier `raw` dans le Volume ;
+- téléversement du CSV et exécution réussie des notebooks 00, 01 et 02 ;
+- inspection locale des 12 groupes de doublons selon la séparation 60/20/20 ;
+- création de `src/bank_marketing/preprocessing.py` ;
+- création du notebook `03_preprocessing_silver.py` ;
+- ajout de tests sur les frontières chronologiques, la fuite et les
+  transformations Silver.
+
+#### Résultats et décisions
+
+- les 12 répétitions se trouvent dans le même split que leur première occurrence :
+  7 dans train, 3 dans validation et 2 dans test ;
+- Silver conserve la première occurrence et retire les 12 répétitions ;
+- Silver contient donc 41 176 lignes : 36 537 cibles 0 et 4 639 cibles 1 ;
+- les splits contiennent 24 705, 8 235 et 8 236 lignes ;
+- les taux positifs diffèrent fortement dans le temps, ce qui justifie une
+  validation chronologique ;
+- `unknown` reste une catégorie pour la baseline ;
+- `pdays=999` devient `previously_contacted=0` et
+  `days_since_previous_contact=0` ;
+- `duration` reste dans Silver pour l'audit, mais est exclue de
+  `DEPLOYMENT_FEATURES`.
+
+#### Pourquoi ces choix
+
+Bronze doit rester une copie fidèle et traçable. Silver peut retirer les
+répétitions sans masquer leur existence, car leur nombre et leur emplacement
+sont documentés. La transformation de `pdays` empêche qu'une sentinelle 999 soit
+interprétée comme un nombre réel de jours. La conservation temporaire de
+`unknown` évite une imputation arbitraire avant toute comparaison sur validation.
+
+#### Validation locale
+
+- transformation complète exécutée sur le CSV officiel ;
+- 14 tests automatisés réussis ;
+- compilation Python et contrôle des espaces Git réussis.
+
+#### Prochaine action exacte
+
+Publier la branche Silver, la tirer dans Databricks, exécuter
+`03_preprocessing_silver.py`, puis construire la pipeline scikit-learn et les
+baselines dans `04_modeling_baselines.py`.
 
 ---
 
@@ -364,6 +417,34 @@ Relire et fusionner la pull request #1, tirer `main` dans le Git Folder, exécut
 - **Décision :** ne pas démarrer de serveur MLflow local.
 - **Raison :** Databricks fournit MLflow ; le compute serverless demande un appel explicite à `mlflow.autolog()`.
 
+### DEC-022 — Dédupliquer seulement dans Silver
+
+- **Date :** 1er juillet 2026
+- **État :** ACCEPTÉE
+- **Décision :** conserver Bronze intact et retirer les 12 répétitions exactes
+  dans Silver en gardant la première occurrence chronologique.
+- **Raison :** aucune paire ne traverse deux splits, mais conserver les deux
+  occurrences surpondérerait inutilement des lignes identiques.
+
+### DEC-023 — Conserver `unknown` pour la première baseline
+
+- **Date :** 1er juillet 2026
+- **État :** PROVISOIRE
+- **Décision :** traiter `unknown` comme une catégorie explicite dans le premier
+  modèle.
+- **Raison :** ce n'est pas un `NaN` brut et l'imputation ne doit pas être
+  choisie sans comparaison sur validation.
+
+### DEC-024 — Transformer la sentinelle `pdays=999`
+
+- **Date :** 1er juillet 2026
+- **État :** ACCEPTÉE
+- **Décision :** créer `previously_contacted` et
+  `days_since_previous_contact`, avec zéro jour lorsque le client n'a jamais été
+  contacté.
+- **Raison :** 999 est un code métier, pas une durée réelle ; l'indicateur
+  distingue l'absence de contact d'un véritable délai de zéro jour.
+
 ---
 
 ## 5. Décisions encore ouvertes
@@ -377,9 +458,11 @@ Relire et fusionner la pull request #1, tirer `main` dans le Git Folder, exécut
 
 ### OUV-002 — Traitement des 12 doublons
 
-- **État :** À FAIRE
-- **Options :** conserver ; supprimer ; regrouper.
-- **Condition de décision :** vérifier si les doublons sont répartis à des endroits différents de la chronologie et évaluer le risque de contamination des splits.
+- **État :** RÉSOLUE par DEC-022
+- **Décision :** retirer dans Silver les 12 répétitions en conservant la
+  première occurrence.
+- **Preuve :** 7 répétitions sont dans train, 3 dans validation et 2 dans test ;
+  aucune paire ne traverse deux ensembles.
 
 ### OUV-003 — Seuil métier
 
@@ -412,53 +495,53 @@ Relire et fusionner la pull request #1, tirer `main` dans le Git Folder, exécut
 ### Prochaine étape immédiate
 
 1. `TERMINÉ` Publier les fichiers Databricks préparés sur GitHub dans la branche `codex/databricks-foundation`.
-2. `À FAIRE` Relire et fusionner la pull request #1 dans `main`.
-3. `À FAIRE` Tirer `main` dans le Databricks Git Folder.
-4. `À FAIRE` Exécuter `00_configuration.py` sur compute serverless.
-5. `À FAIRE` Téléverser `data/raw/bank-additional-full.csv` dans le Volume affiché.
-6. `À FAIRE` Exécuter et valider `01_ingestion_bronze.py`.
-7. `À FAIRE` Exécuter `02_eda.py` et conserver les premières observations.
-8. `À FAIRE` Initialiser DVC côté local pour la provenance du fichier.
-9. `À FAIRE` Valider les bibliothèques disponibles dans le compute serverless.
+2. `TERMINÉ` Relire et fusionner la pull request #1 dans `main`.
+3. `TERMINÉ` Tirer `main` dans le Databricks Git Folder.
+4. `TERMINÉ` Exécuter `00_configuration.py` sur compute serverless.
+5. `TERMINÉ` Téléverser `data/raw/bank-additional-full.csv` dans le Volume affiché.
+6. `TERMINÉ` Exécuter et valider `01_ingestion_bronze.py`.
+7. `TERMINÉ` Exécuter `02_eda.py` et conserver les premières observations.
+8. `EN COURS` Préparer et exécuter `03_preprocessing_silver.py`.
+9. `À FAIRE` Initialiser DVC côté local pour la provenance du fichier.
+10. `À FAIRE` Valider les bibliothèques disponibles dans le compute serverless.
 
 ### Acquisition et validation du schéma
 
 - `À FAIRE` Créer `src/bank_marketing/data.py`.
-- `À FAIRE` Définir la liste exacte des 21 colonnes attendues.
-- `À FAIRE` Vérifier séparateur `;`, encodage et types.
-- `À FAIRE` Ajouter une erreur claire si la cible manque.
-- `À FAIRE` Ajouter un test de chargement.
-- `À FAIRE` Documenter la provenance dans le README.
+- `TERMINÉ` Définir la liste exacte des 21 colonnes attendues.
+- `TERMINÉ` Vérifier séparateur `;`, encodage et types.
+- `TERMINÉ` Ajouter une erreur claire si la cible manque.
+- `TERMINÉ` Ajouter des tests du contrat de données.
+- `TERMINÉ` Documenter la provenance dans le README et le manifeste.
 
 ### EDA
 
-- `À FAIRE` Vue globale et statistiques.
-- `À FAIRE` Audit des valeurs inconnues.
-- `À FAIRE` Audit des doublons.
-- `À FAIRE` Distribution cible.
-- `À FAIRE` Distributions numériques.
-- `À FAIRE` Box plots et valeurs extrêmes.
-- `À FAIRE` Variables catégorielles.
-- `À FAIRE` Taux de conversion par groupe.
-- `À FAIRE` Corrélations.
-- `À FAIRE` Tendances temporelles.
-- `À FAIRE` Illustration de la fuite `duration`.
+- `TERMINÉ` Vue globale et statistiques.
+- `TERMINÉ` Audit des valeurs inconnues.
+- `TERMINÉ` Audit des doublons.
+- `TERMINÉ` Distribution cible.
+- `TERMINÉ` Distributions numériques.
+- `TERMINÉ` Box plots et valeurs extrêmes.
+- `TERMINÉ` Variables catégorielles et taux de conversion par groupe.
+- `TERMINÉ` Corrélations.
+- `TERMINÉ` Première mesure de dérive entre les segments temporels.
+- `TERMINÉ` Illustration de la fuite `duration`.
 - `À FAIRE` Tests statistiques ciblés et tailles d'effet.
 - `À FAIRE` Export des graphiques.
 - `À FAIRE` Conclusions écrites après chaque section.
 
 ### Prétraitement
 
-- `À FAIRE` Séparation chronologique.
-- `À FAIRE` Encodage de la cible.
-- `À FAIRE` Exclusion de `duration`.
-- `À FAIRE` Traitement de `pdays=999`.
-- `À FAIRE` Traitement de `unknown`.
+- `TERMINÉ` Séparation chronologique.
+- `TERMINÉ` Encodage de la cible.
+- `TERMINÉ` Exclusion de `duration` des variables déployables.
+- `TERMINÉ` Traitement de `pdays=999`.
+- `EN COURS` Conserver `unknown` pour la baseline, puis comparer sur validation.
 - `À FAIRE` Encodage one-hot.
 - `À FAIRE` Standardisation des numériques.
 - `À FAIRE` Pipeline complète.
-- `À FAIRE` Tests de dimensions et de colonnes.
-- `À FAIRE` Vérification d'absence de fuite.
+- `TERMINÉ` Tests de dimensions, colonnes et frontières chronologiques.
+- `TERMINÉ` Vérification statique de l'absence de `duration` dans les variables déployables.
 
 ### Modèles et expériences
 
@@ -502,10 +585,8 @@ Relire et fusionner la pull request #1, tirer `main` dans le Git Folder, exécut
 
 ## 7. Blocages actuels
 
-Deux actions manuelles demeurent : fusionner la pull request #1, puis téléverser
-le CSV dans le Unity Catalog Volume. Les notebooks ne peuvent pas contourner le
-téléversement de façon fiable dans Free Edition à cause de l'accès Internet
-sortant restreint.
+Aucun blocage actif. Une exécution manuelle du nouveau notebook Silver demeure
+nécessaire dans Databricks après sa publication et sa synchronisation.
 
 Éléments à surveiller :
 
@@ -581,7 +662,7 @@ Chaque nouvelle séance utilisera ce modèle :
 
 ## 10. Prochaine action exacte
 
-La prochaine séance doit commencer par fusionner la pull request #1. Ensuite,
-dans Databricks : tirer `main`, exécuter le notebook de configuration, téléverser
-le CSV officiel, créer la table Bronze et exécuter l'EDA initiale. Aucun notebook
-de modèle ne doit être commencé avant que ces contrôles réussissent.
+Publier la branche `codex/silver-preprocessing`, la synchroniser dans Databricks
+et exécuter `03_preprocessing_silver.py`. Vérifier les comptes affichés avant de
+commencer `04_modeling_baselines.py`. Le test final ne doit pas être utilisé pour
+choisir une transformation, un modèle ou un seuil.

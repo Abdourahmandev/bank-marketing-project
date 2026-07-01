@@ -110,16 +110,14 @@ print(f"- table Silver: {SILVER_TABLE}")
 
 # COMMAND ----------
 
-# DBTITLE 1,Ensure directory structure
-from pathlib import Path
-
-# Ensure the raw directory exists
+# DBTITLE 1,Créer la structure du Volume
+# Crée le sous-dossier attendu par le notebook d'ingestion.
 raw_dir = Path(RAW_DIRECTORY)
 raw_dir.mkdir(parents=True, exist_ok=True)
 
-# Check if file is in wrong location (volume root) and move it
+# Si le fichier a été téléversé à la racine du Volume, le déplacer dans raw/.
 volume_root = Path(VOLUME_PATH)
-wrong_location = volume_root / DATASET_MANIFEST['variant']
+wrong_location = volume_root / DATASET_MANIFEST["variant"]
 if wrong_location.is_file() and not Path(RAW_CSV_PATH).is_file():
     wrong_location.rename(RAW_CSV_PATH)
     print(f"Fichier déplacé vers: {RAW_CSV_PATH}")

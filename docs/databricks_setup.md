@@ -113,7 +113,23 @@ Les premiers résultats attendus sont :
 - plusieurs valeurs catégorielles `unknown` ;
 - forte association entre `duration` et `y`, mais `duration` non disponible avant l'appel.
 
-## 6. Règles de travail
+## 6. Créer la table Silver
+
+Après l'EDA, exécuter :
+
+```text
+notebooks/databricks/03_preprocessing_silver.py
+```
+
+Les contrôles attendus sont :
+
+- 41 176 lignes après retrait des 12 répétitions exactes ;
+- cible binaire : 36 537 zéros et 4 639 uns ;
+- 24 705 lignes d'entraînement, 8 235 de validation et 8 236 de test ;
+- aucune valeur sentinelle `999` dans `days_since_previous_contact` ;
+- `duration` absente de la liste `DEPLOYMENT_FEATURES`.
+
+## 7. Règles de travail
 
 - GitHub contient le code, la documentation et les notebooks.
 - Le Volume contient le CSV brut.

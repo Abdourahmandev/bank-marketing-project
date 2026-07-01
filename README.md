@@ -27,10 +27,11 @@ La variable `duration` sera étudiée, mais exclue du modèle final puisqu'elle 
 
 ## État
 
-La configuration Databricks, le contrat de données et les notebooks initiaux
-d'ingestion/EDA sont préparés. Le CSV doit encore être téléversé dans Unity
-Catalog et la table Bronze doit être exécutée. Aucun résultat de modèle n'est
-encore disponible.
+Le CSV officiel a été téléversé dans Unity Catalog et les notebooks de
+configuration, d'ingestion Bronze et d'EDA ont été exécutés. Le prétraitement
+Silver est prêt à être exécuté : il déduplique les données, encode la cible,
+transforme `pdays=999` et crée les ensembles chronologiques. Aucun résultat de
+modèle n'est encore disponible.
 
 ## Documentation de travail
 

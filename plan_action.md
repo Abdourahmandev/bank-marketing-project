@@ -400,10 +400,10 @@ Limites attendues : coût de prédiction sur 41 188 lignes, sensibilité à l'é
 - [x] P1.3 Conserver le CSV brut sans modification dans `data/raw/`.
 - [ ] P1.4 Ajouter le CSV à DVC.
 - [x] P1.5 Documenter la source, licence, citation et empreinte dans un manifeste.
-- [ ] P1.6 Téléverser le CSV dans un Unity Catalog Volume.
+- [x] P1.6 Téléverser le CSV dans un Unity Catalog Volume.
 - [x] P1.7 Écrire un contrat validant les colonnes, les lignes et la cible.
 - [x] P1.8 Préparer le notebook d'ingestion Delta Bronze.
-- [ ] P1.9 Exécuter et valider la table Bronze dans Databricks.
+- [x] P1.9 Exécuter et valider la table Bronze dans Databricks.
 
 **Critère de sortie :** la source exacte du dataset est prouvée, son ordre est
 préservé, le chargement échoue clairement si le fichier change et la table Delta
@@ -411,14 +411,14 @@ Bronze est visible dans Unity Catalog.
 
 ### Phase 2 — Analyse exploratoire
 
-- [ ] P2.1 Examiner dimensions, types et aperçu.
-- [ ] P2.2 Rechercher doublons, `NaN`, infinis et valeurs `unknown`.
-- [ ] P2.3 Vérifier la distribution de `y`.
-- [ ] P2.4 Étudier les variables numériques avec statistiques, histogrammes, KDE et box plots.
-- [ ] P2.5 Étudier les variables catégorielles et leur taux de souscription.
-- [ ] P2.6 Produire la matrice de corrélation numérique.
-- [ ] P2.7 Examiner les variations temporelles.
-- [ ] P2.8 Étudier `duration` et expliquer la fuite.
+- [x] P2.1 Examiner dimensions, types et aperçu.
+- [x] P2.2 Rechercher doublons, `NaN`, infinis et valeurs `unknown`.
+- [x] P2.3 Vérifier la distribution de `y`.
+- [x] P2.4 Étudier les variables numériques avec statistiques, histogrammes, KDE et box plots.
+- [x] P2.5 Étudier les variables catégorielles et leur taux de souscription.
+- [x] P2.6 Produire la matrice de corrélation numérique.
+- [x] P2.7 Examiner les variations temporelles entre les segments 60/20/20.
+- [x] P2.8 Étudier `duration` et expliquer la fuite.
 - [ ] P2.9 Tester quelques hypothèses pertinentes.
 - [ ] P2.10 Documenter les limites et biais potentiels.
 - [ ] P2.11 Exporter les figures finales dans `reports/figures/`.
@@ -427,14 +427,14 @@ Bronze est visible dans Unity Catalog.
 
 ### Phase 3 — Prétraitement et création des variables
 
-- [ ] P3.1 Séparer prédicteurs et cible.
-- [ ] P3.2 Encoder la cible en 0/1.
-- [ ] P3.3 Retirer `duration` du scénario réaliste.
-- [ ] P3.4 Décider du traitement des 12 doublons après inspection.
+- [x] P3.1 Séparer prédicteurs et cible dans le schéma Silver.
+- [x] P3.2 Encoder la cible en 0/1.
+- [x] P3.3 Retirer `duration` de la liste des variables déployables.
+- [x] P3.4 Retirer les 12 répétitions exactes après inspection des splits.
 - [ ] P3.5 Décider du traitement de `unknown` par validation.
-- [ ] P3.6 Transformer le code sentinelle `pdays=999`.
-- [ ] P3.7 Créer `previously_contacted` si elle apporte une information utile.
-- [ ] P3.8 Définir listes numériques et catégorielles.
+- [x] P3.6 Transformer le code sentinelle `pdays=999`.
+- [x] P3.7 Créer `previously_contacted` et `days_since_previous_contact`.
+- [x] P3.8 Définir les listes numériques et catégorielles déployables.
 - [ ] P3.9 Construire `ColumnTransformer`.
 - [ ] P3.10 Ajouter imputation, one-hot encoding et normalisation.
 - [ ] P3.11 Tester le pipeline sur un petit échantillon.
@@ -444,9 +444,9 @@ Bronze est visible dans Unity Catalog.
 
 ### Phase 4 — Protocole expérimental et références
 
-- [ ] P4.1 Créer les ensembles chronologiques 60/20/20.
-- [ ] P4.2 Vérifier les proportions de classes dans chaque ensemble.
-- [ ] P4.3 Conserver les indices de séparation.
+- [x] P4.1 Créer les ensembles chronologiques 60/20/20.
+- [x] P4.2 Vérifier les proportions de classes dans chaque ensemble.
+- [x] P4.3 Conserver les positions source et les étiquettes de séparation.
 - [ ] P4.4 Entraîner `DummyClassifier`.
 - [ ] P4.5 Produire les métriques de référence.
 - [ ] P4.6 Montrer pourquoi l'accuracy seule est insuffisante.
