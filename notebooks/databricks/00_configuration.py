@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "2"
+# ///
 # MAGIC %md
 # MAGIC # 00 — Configuration du projet
 # MAGIC
@@ -103,3 +107,24 @@ print(f"- CSV brut    : {RAW_CSV_PATH}")
 print(f"- table Bronze: {BRONZE_TABLE}")
 print(f"- table Silver: {SILVER_TABLE}")
 
+
+# COMMAND ----------
+
+# DBTITLE 1,Ensure directory structure
+from pathlib import Path
+
+# Ensure the raw directory exists
+raw_dir = Path(RAW_DIRECTORY)
+raw_dir.mkdir(parents=True, exist_ok=True)
+
+# Check if file is in wrong location (volume root) and move it
+volume_root = Path(VOLUME_PATH)
+wrong_location = volume_root / DATASET_MANIFEST['variant']
+if wrong_location.is_file() and not Path(RAW_CSV_PATH).is_file():
+    wrong_location.rename(RAW_CSV_PATH)
+    print(f"Fichier déplacé vers: {RAW_CSV_PATH}")
+elif Path(RAW_CSV_PATH).is_file():
+    print(f"Fichier déjà présent: {RAW_CSV_PATH}")
+else:
+    print(f"Fichier attendu à: {RAW_CSV_PATH}")
+    print("Veuillez téléverser le fichier dans le volume.")
