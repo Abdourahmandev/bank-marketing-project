@@ -6,6 +6,7 @@
 - **Cours :** Techniques d'apprentissage automatique — 420-C74-BB
 - **Projet :** prédiction du succès d'une campagne de télémarketing bancaire
 - **Type d'apprentissage :** apprentissage supervisé, classification binaire
+- **Plateforme d'exécution :** Databricks Free Edition, compute serverless
 - **Date de création du plan :** 30 juin 2026
 - **Présentation prévue :** 11 août 2026
 - **Remise prévue :** 15 août 2026
@@ -170,6 +171,30 @@ Aucun résultat de performance ne sera inventé. Toutes les valeurs présentées
 
 Le but est de livrer un projet complet et défendable, pas d'accumuler des technologies.
 
+### 5.4 Architecture Databricks retenue
+
+Le projet utilise une architecture hybride, afin de profiter de Databricks sans
+abandonner les outils du cours :
+
+1. **GitHub** demeure la source de vérité du code, des notebooks et de la documentation.
+2. **Databricks Git Folder** synchronise le dépôt dans le workspace.
+3. Le CSV officiel est vérifié localement, suivi par DVC pour sa provenance, puis
+   téléversé dans un **Unity Catalog Volume**.
+4. Une table **Delta Bronze** conserve une copie contrôlée des données et l'ordre
+   original des lignes.
+5. Une table **Delta Silver** contiendra les transformations déterministes et les
+   variables préparées.
+6. Spark et SQL servent à l'ingestion, aux contrôles et aux tables Delta.
+7. Le dataset de 41 188 lignes est converti en pandas pour la modélisation avec
+   scikit-learn, conformément au cours.
+8. **MLflow Databricks** enregistre les expériences, métriques, figures et modèles.
+9. Le modèle final produit des probabilités et peut écrire les résultats dans une
+   table Delta de prédictions.
+
+Free Edition étant limitée en compute et en accès Internet sortant, le projet ne
+dépendra ni d'un téléchargement Web exécuté depuis un notebook, ni d'un endpoint
+temps réel pour sa démonstration principale.
+
 ---
 
 ## 6. Outils retenus et raisons
@@ -177,15 +202,19 @@ Le but est de livrer un projet complet et défendable, pas d'accumuler des techn
 | Outil | Utilisation prévue | Justification |
 |---|---|---|
 | Python | langage principal | langage utilisé dans le cours et écosystème ML mature |
-| Jupyter | exploration et présentation des analyses | permet de combiner code, résultats et explications |
+| Databricks Notebooks | exploration, ingestion, modélisation et présentation | environnement principal du projet, synchronisé par Git Folder |
+| Databricks Free Edition | exécution serverless | permet d'apprendre la plateforme sans coût, avec un périmètre compatible avec les quotas |
+| Apache Spark / SQL | ingestion, contrôles et tables | démontre l'utilisation Databricks sans imposer Spark à la modélisation scikit-learn |
+| Unity Catalog Volume | stockage gouverné du CSV brut | remplace les chemins locaux pendant l'exécution Databricks |
+| Delta Lake | tables Bronze, Silver et prédictions | apporte schéma, historique et reproductibilité des transformations |
 | pandas | chargement, audit et transformation | outil principal du cours pour les données tabulaires |
 | NumPy | calcul numérique | base des opérations scientifiques Python |
 | matplotlib / seaborn | visualisations | adaptés aux distributions, box plots et matrices de corrélation |
 | ydata-profiling | rapport exploratoire secondaire | utile pour détecter rapidement certains problèmes, sans remplacer l'EDA manuelle |
 | scikit-learn | prétraitement, modèles, validation et métriques | bibliothèque centrale du cours |
-| MLflow | suivi des paramètres, métriques et modèles | notion explicite du cours et utile pour comparer les expériences |
+| MLflow Databricks | suivi des paramètres, métriques, figures et modèles | service intégré ; aucun serveur MLflow local à maintenir |
 | Git / GitHub | version du code et collaboration | historique, sauvegarde et démonstration de bonnes pratiques |
-| DVC | version du dataset et pipeline de données | notion explicite du cours ; évite de versionner le CSV directement dans Git |
+| DVC | provenance durable du fichier officiel côté local | complète Delta Lake ; le CSV utilisé par Databricks réside dans Unity Catalog |
 | joblib | sauvegarde de la pipeline finale | format simple pour les objets scikit-learn |
 | pytest | tests minimaux | vérifie automatiquement les fonctions importantes |
 | GitHub Actions | intégration continue minimale | exécute les validations de base à chaque changement publié |
@@ -208,13 +237,22 @@ bank-marketing-project/
 │   └── workflows/
 │       └── ci.yml
 ├── data/
+│   ├── dataset_manifest.json
 │   ├── raw/
 │   ├── interim/
 │   └── processed/
+├── docs/
+│   └── databricks_setup.md
 ├── notebooks/
-│   ├── 01_eda.ipynb
-│   ├── 02_preprocessing.ipynb
-│   └── 03_modeling_evaluation.ipynb
+│   └── databricks/
+│       ├── 00_configuration.py
+│       ├── 01_ingestion_bronze.py
+│       ├── 02_eda.py
+│       ├── 03_preprocessing_silver.py
+│       ├── 04_modeling_baselines.py
+│       ├── 05_tuning_mlflow.py
+│       ├── 06_final_evaluation.py
+│       └── 07_inference_demo.py
 ├── src/
 │   └── bank_marketing/
 │       ├── __init__.py
@@ -230,7 +268,10 @@ bank-marketing-project/
 └── tests/
 ```
 
-Les notebooks serviront à expliquer et explorer. Le code réutilisable sera déplacé dans `src/` pour éviter que toute la logique reste enfermée dans des notebooks.
+Les notebooks Databricks au format source `.py` servent à expliquer, explorer et
+orchestrer. Le code réutilisable reste dans `src/` pour éviter que toute la
+logique soit enfermée dans des notebooks. Les données volumineuses ne sont jamais
+placées dans le Git Folder.
 
 ---
 
@@ -344,24 +385,29 @@ Limites attendues : coût de prédiction sur 41 188 lignes, sensibilité à l'é
 - [x] P0.5 Cloner le dépôt localement.
 - [x] P0.6 Créer le plan d'action et le journal de suivi.
 - [x] P0.7 Créer l'arborescence initiale.
-- [ ] P0.8 Créer et tester l'environnement Python.
-- [ ] P0.9 Ajouter les dépendances et verrouiller leurs versions.
+- [x] P0.8 Connecter GitHub à Databricks avec un Git Folder.
+- [x] P0.9 Ajouter le manifeste et la configuration Databricks initiale.
 - [ ] P0.10 Configurer DVC.
-- [ ] P0.11 Configurer MLflow local.
+- [ ] P0.11 Valider les bibliothèques du compute serverless et documenter les dépendances additionnelles.
+- [ ] P0.12 Valider MLflow géré avec `mlflow.autolog()`.
 
 **Critère de sortie :** projet clonable, structure compréhensible, environnement reproductible et plan approuvé.
 
 ### Phase 1 — Acquisition et gouvernance des données
 
-- [ ] P1.1 Télécharger l'archive officielle.
-- [ ] P1.2 Vérifier le fichier et son empreinte SHA-256.
-- [ ] P1.3 Conserver le CSV brut sans modification dans `data/raw/`.
+- [x] P1.1 Télécharger l'archive officielle hors Databricks.
+- [x] P1.2 Vérifier le fichier, sa taille et son empreinte SHA-256.
+- [x] P1.3 Conserver le CSV brut sans modification dans `data/raw/`.
 - [ ] P1.4 Ajouter le CSV à DVC.
-- [ ] P1.5 Documenter la source, licence et citation.
-- [ ] P1.6 Créer un dictionnaire des variables.
-- [ ] P1.7 Écrire une fonction de chargement validant les colonnes attendues.
+- [x] P1.5 Documenter la source, licence, citation et empreinte dans un manifeste.
+- [ ] P1.6 Téléverser le CSV dans un Unity Catalog Volume.
+- [x] P1.7 Écrire un contrat validant les colonnes, les lignes et la cible.
+- [x] P1.8 Préparer le notebook d'ingestion Delta Bronze.
+- [ ] P1.9 Exécuter et valider la table Bronze dans Databricks.
 
-**Critère de sortie :** la source exacte du dataset est prouvée et le chargement échoue clairement si le schéma change.
+**Critère de sortie :** la source exacte du dataset est prouvée, son ordre est
+préservé, le chargement échoue clairement si le fichier change et la table Delta
+Bronze est visible dans Unity Catalog.
 
 ### Phase 2 — Analyse exploratoire
 
@@ -548,6 +594,9 @@ Un tampon est conservé après la présentation pour corriger la documentation e
 | valeur `unknown` mal interprétée | transformation injustifiée | comparer les traitements en validation |
 | étudiant seul | surcharge et risque d'échéance | prioriser un produit minimum complet |
 | résultats non reproductibles | perte de crédibilité | versions, seeds, Git, DVC et MLflow |
+| quota Free Edition épuisé | compute indisponible temporairement | expériences limitées, résultats persistés et démonstration de secours |
+| accès Internet sortant restreint | téléchargement UCI impossible dans le notebook | téléversement contrôlé du CSV dans un Volume |
+| ordre des lignes perdu par Spark | test chronologique invalide | ajouter `_source_row_number` avec pandas avant la conversion Spark |
 | modèle difficile à expliquer | présentation faible | conserver une référence interprétable |
 | variables démographiques | risque de biais | analyse par sous-groupes et limites explicites |
 
@@ -565,4 +614,3 @@ Un tampon est conservé après la présentation pour corriger la documentation e
 8. Les limites doivent être présentées honnêtement.
 9. Toute source externe doit être citée.
 10. Le code doit rester compréhensible par l'étudiant et pouvoir être expliqué pendant les questions.
-

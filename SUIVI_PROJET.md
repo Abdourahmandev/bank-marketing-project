@@ -30,19 +30,29 @@ Il doit être mis à jour après chaque séance de travail importante. Le plan c
 | choix du dataset | TERMINÉ | UCI Bank Marketing, variante additional-full |
 | dépôt GitHub | TERMINÉ | dépôt créé par l'étudiant |
 | clone local | TERMINÉ | clone effectué ; dépôt initialement vide |
+| push initial GitHub | TERMINÉ | identité corrigée avec l'adresse GitHub privée `noreply` |
+| GitHub App Databricks | TERMINÉ | autorisation et accès au dépôt confirmés par l'étudiant |
+| Databricks Git Folder | TERMINÉ | dépôt visible et synchronisable dans le workspace |
+| fondation Databricks publiée | EN COURS | branche `codex/databricks-foundation` publiée ; PR #1 à fusionner dans `main` |
 | planification | TERMINÉ | `plan_action.md` créé |
 | journal de suivi | TERMINÉ | présent fichier créé |
 | arborescence initiale | TERMINÉ | dossiers de données, notebooks, code, modèles, rapports, tests et présentation |
-| environnement Python | À FAIRE | versions à tester et verrouiller |
+| configuration Databricks | TERMINÉ | notebook de configuration Unity Catalog ajouté |
+| manifeste du dataset | TERMINÉ | taille, SHA-256, schéma et comptes de référence ajoutés |
+| CSV brut local | TERMINÉ | copie officielle vérifiée dans `data/raw/`, ignorée par Git |
+| ingestion Bronze | EN COURS | notebook prêt ; téléversement et exécution requis dans Databricks |
+| environnement Python | EN COURS | compute serverless retenu ; bibliothèques à valider dans le workspace |
 | acquisition avec DVC | À FAIRE | fichier officiel pas encore ajouté au dépôt de projet |
-| EDA | À FAIRE | observations préliminaires vérifiées hors dépôt seulement |
+| EDA | EN COURS | notebook Databricks initial ajouté ; exécution après création Bronze |
 | prétraitement | À FAIRE | décisions principales planifiées, non implémentées |
 | modélisation | À FAIRE | aucun modèle entraîné dans le dépôt |
-| MLflow | À FAIRE | configuration prévue |
+| MLflow | À FAIRE | MLflow Databricks géré ; autologging serverless à activer explicitement |
 | évaluation finale | À FAIRE | aucun résultat ne doit être annoncé avant exécution |
 | présentation | À FAIRE | plan temporel défini, PowerPoint non créé |
 
-Estimation prudente de l'avancement total : **environ 8 %**. Le cadrage est solide, mais le travail analytique et technique reste à réaliser.
+Estimation prudente de l'avancement total : **environ 15 %**. L'architecture et
+l'ingestion sont préparées, mais elles doivent encore être exécutées dans le
+workspace avant de commencer les décisions de prétraitement.
 
 ---
 
@@ -147,6 +157,53 @@ Dossiers créés :
 - `tests/`.
 
 **Pourquoi cette structure :** elle sépare clairement données brutes, données transformées, exploration, code réutilisable, modèles, rapports et tests. Elle est inspirée de Cookiecutter Data Science, mentionné dans le tableau blanc du cours.
+
+### Séance du 30 juin 2026 — Migration vers Databricks
+
+#### Objectif
+
+Adapter le projet à Databricks Free Edition sans abandonner les méthodes du cours
+ni rendre le projet dépendant de fonctions payantes.
+
+#### Actions effectuées
+
+- connexion GitHub/Databricks terminée par l'étudiant ;
+- vérification que `main` local et `origin/main` sont synchronisés ;
+- ajout d'un manifeste JSON du dataset officiel ;
+- calcul et enregistrement du SHA-256 du CSV complet ;
+- création d'un contrat de données réutilisable dans `src/` ;
+- création du notebook Databricks `00_configuration.py` ;
+- création du notebook `01_ingestion_bronze.py` ;
+- création du notebook initial `02_eda.py` ;
+- création d'un guide de configuration Databricks ;
+- adaptation du plan et du journal à Unity Catalog, Delta Lake et MLflow géré.
+- copie du CSV officiel vérifié dans `data/raw/bank-additional-full.csv` pour le téléversement manuel ;
+- publication du commit `prepare Databricks foundation` sur une branche dédiée ;
+- ouverture de la pull request brouillon GitHub #1 vers `main`.
+
+#### Résultats et preuves
+
+- SHA-256 attendu : `74adfc578bf77a7ff4bb1ba4a9f8709d9e3c6907342959c2c8416847e0afb4d8` ;
+- taille attendue : 5 834 924 octets ;
+- contrat attendu : 41 188 lignes, 21 colonnes, 36 548 `no`, 4 640 `yes` ;
+- l'ingestion refuse un fichier différent avant toute écriture Delta ;
+- `_source_row_number` est créé dans pandas avant Spark pour préserver l'ordre du CSV.
+
+#### Décisions prises et raisons
+
+- Spark/SQL pour ingestion et tables ; pandas/scikit-learn pour les modèles.
+  Le dataset est petit et le cours porte sur scikit-learn.
+- Unity Catalog Volume pour le CSV d'exécution ; DVC conserve un rôle de
+  provenance côté local.
+- MLflow intégré remplacera le serveur MLflow local.
+- Le téléchargement UCI ne sera pas exécuté depuis Free Edition, car l'accès
+  Internet sortant y est restreint.
+
+#### Prochaine action exacte
+
+Relire et fusionner la pull request #1, tirer `main` dans le Git Folder, exécuter
+`00_configuration.py`, téléverser le CSV dans le Volume, puis exécuter
+`01_ingestion_bronze.py` et `02_eda.py`.
 
 ---
 
@@ -265,6 +322,48 @@ Dossiers créés :
 - **Décision :** travailler et vérifier localement avant commit/push.
 - **Raison :** éviter de publier des fichiers incomplets ou des données qui ne devraient pas être suivies par Git.
 
+### DEC-016 — Utiliser Databricks Free Edition comme plateforme principale
+
+- **Date :** 30 juin 2026
+- **État :** ACCEPTÉE
+- **Décision :** exécuter ingestion, EDA, modèles et MLflow dans Databricks.
+- **Raison :** objectif d'apprentissage de l'étudiant et bonne adéquation avec l'infrastructure demandée dans le cours.
+
+### DEC-017 — Adopter une architecture hybride Spark et scikit-learn
+
+- **Date :** 30 juin 2026
+- **État :** ACCEPTÉE
+- **Décision :** Spark/Delta pour les données, pandas/scikit-learn pour le ML.
+- **Raison :** profiter de Databricks tout en restant cohérent avec le cours et la taille modeste du dataset.
+
+### DEC-018 — Stocker le CSV dans un Unity Catalog Volume
+
+- **Date :** 30 juin 2026
+- **État :** ACCEPTÉE
+- **Décision :** ne pas placer le CSV dans Git ou dans le Git Folder.
+- **Raison :** séparation du code et des données, gouvernance Unity Catalog et limites des Git Folders.
+
+### DEC-019 — Utiliser Delta Bronze et Silver
+
+- **Date :** 30 juin 2026
+- **État :** ACCEPTÉE
+- **Décision :** Bronze pour la copie contrôlée, Silver pour les transformations déterministes.
+- **Raison :** démontrer Delta Lake avec une architecture proportionnée au projet.
+
+### DEC-020 — Préserver explicitement l'ordre source
+
+- **Date :** 30 juin 2026
+- **État :** ACCEPTÉE
+- **Décision :** créer `_source_row_number` avant la conversion Spark.
+- **Raison :** une table Spark n'a pas d'ordre implicite, alors que la validation finale dépend de l'ordre chronologique publié par UCI.
+
+### DEC-021 — Utiliser MLflow géré et activer autolog explicitement
+
+- **Date :** 30 juin 2026
+- **État :** ACCEPTÉE
+- **Décision :** ne pas démarrer de serveur MLflow local.
+- **Raison :** Databricks fournit MLflow ; le compute serverless demande un appel explicite à `mlflow.autolog()`.
+
 ---
 
 ## 5. Décisions encore ouvertes
@@ -312,15 +411,15 @@ Dossiers créés :
 
 ### Prochaine étape immédiate
 
-1. `À FAIRE` Créer un environnement virtuel local.
-2. `À FAIRE` Vérifier les versions compatibles de Python et des bibliothèques.
-3. `À FAIRE` Créer `requirements.txt` après installation testée.
-4. `À FAIRE` Initialiser DVC.
-5. `À FAIRE` Télécharger l'archive officielle dans un processus reproductible.
-6. `À FAIRE` Calculer l'empreinte SHA-256 du fichier brut.
-7. `À FAIRE` Ajouter le CSV brut avec DVC et vérifier qu'il n'est pas suivi par Git.
-8. `À FAIRE` Écrire le dictionnaire de données.
-9. `À FAIRE` Commencer `01_eda.ipynb`.
+1. `TERMINÉ` Publier les fichiers Databricks préparés sur GitHub dans la branche `codex/databricks-foundation`.
+2. `À FAIRE` Relire et fusionner la pull request #1 dans `main`.
+3. `À FAIRE` Tirer `main` dans le Databricks Git Folder.
+4. `À FAIRE` Exécuter `00_configuration.py` sur compute serverless.
+5. `À FAIRE` Téléverser `data/raw/bank-additional-full.csv` dans le Volume affiché.
+6. `À FAIRE` Exécuter et valider `01_ingestion_bronze.py`.
+7. `À FAIRE` Exécuter `02_eda.py` et conserver les premières observations.
+8. `À FAIRE` Initialiser DVC côté local pour la provenance du fichier.
+9. `À FAIRE` Valider les bibliothèques disponibles dans le compute serverless.
 
 ### Acquisition et validation du schéma
 
@@ -368,7 +467,7 @@ Dossiers créés :
 - `À FAIRE` Arbre de décision.
 - `À FAIRE` Forêt aléatoire.
 - `OPTIONNEL` k-NN.
-- `À FAIRE` MLflow local.
+- `À FAIRE` MLflow Databricks avec `mlflow.autolog()` explicite.
 - `À FAIRE` Fonction commune d'évaluation.
 - `À FAIRE` Tableau comparatif.
 - `À FAIRE` Recherche d'hyperparamètres.
@@ -403,7 +502,10 @@ Dossiers créés :
 
 ## 7. Blocages actuels
 
-Aucun blocage technique immédiat.
+Deux actions manuelles demeurent : fusionner la pull request #1, puis téléverser
+le CSV dans le Unity Catalog Volume. Les notebooks ne peuvent pas contourner le
+téléversement de façon fiable dans Free Edition à cause de l'accès Internet
+sortant restreint.
 
 Éléments à surveiller :
 
@@ -479,5 +581,7 @@ Chaque nouvelle séance utilisera ce modèle :
 
 ## 10. Prochaine action exacte
 
-La prochaine séance doit commencer par la création de l'environnement Python et l'acquisition reproductible du dataset officiel. Aucun notebook de modèle ne doit être commencé avant que la source brute, le schéma et la séparation prévue soient documentés.
-
+La prochaine séance doit commencer par fusionner la pull request #1. Ensuite,
+dans Databricks : tirer `main`, exécuter le notebook de configuration, téléverser
+le CSV officiel, créer la table Bronze et exécuter l'EDA initiale. Aucun notebook
+de modèle ne doit être commencé avant que ces contrôles réussissent.
