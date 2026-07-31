@@ -22,7 +22,7 @@ Il doit être mis à jour après chaque séance de travail importante. Le plan c
 
 ---
 
-## 2. État global au 1er juillet 2026
+## 2. État global au 31 juillet 2026
 
 | Élément | État | Commentaire |
 |---|---|---|
@@ -41,18 +41,19 @@ Il doit être mis à jour après chaque séance de travail importante. Le plan c
 | manifeste du dataset | TERMINÉ | taille, SHA-256, schéma et comptes de référence ajoutés |
 | CSV brut local | TERMINÉ | copie officielle vérifiée dans `data/raw/`, ignorée par Git |
 | ingestion Bronze | TERMINÉ | CSV téléversé et notebook exécuté par l'étudiant |
-| environnement Python | EN COURS | compute serverless retenu ; bibliothèques à valider dans le workspace |
+| environnement Python | EN COURS | compute serverless retenu ; scikit-learn et MLflow validés, versions à documenter |
 | acquisition avec DVC | À FAIRE | fichier officiel pas encore ajouté au dépôt de projet |
 | EDA | EN COURS | notebook initial exécuté ; analyses avancées et export des figures restent à faire |
-| prétraitement | EN COURS | transformations Silver et tests préparés ; exécution Databricks requise |
-| modélisation | À FAIRE | aucun modèle entraîné dans le dépôt |
-| MLflow | À FAIRE | MLflow Databricks géré ; autologging serverless à activer explicitement |
+| prétraitement | TERMINÉ | table Silver créée et contrôles validés dans Databricks |
+| modélisation | EN COURS | notebook 04 exécuté ; premières baselines comparées sur validation |
+| MLflow | EN COURS | expérience Databricks créée et 5 runs de baselines enregistrés |
 | évaluation finale | À FAIRE | aucun résultat ne doit être annoncé avant exécution |
 | présentation | À FAIRE | plan temporel défini, PowerPoint non créé |
 
-Estimation prudente de l'avancement total : **environ 30 %**. L'architecture,
-l'ingestion et l'EDA initiale fonctionnent ; la table Silver doit maintenant être
-exécutée avant de commencer les modèles de référence.
+Estimation prudente de l'avancement total : **environ 45 %**. L'architecture,
+l'ingestion, l'EDA initiale, Silver et les premières baselines fonctionnent. La
+prochaine étape est d'améliorer les modèles et le seuil sur validation sans
+consulter le test final.
 
 ---
 
@@ -257,6 +258,82 @@ interprétée comme un nombre réel de jours. La conservation temporaire de
 Publier la branche Silver, la tirer dans Databricks, exécuter
 `03_preprocessing_silver.py`, puis construire la pipeline scikit-learn et les
 baselines dans `04_modeling_baselines.py`.
+
+### Séance du 31 juillet 2026 — Exécution Silver et baselines MLflow
+
+#### Objectif
+
+Créer la table Silver dans Databricks, puis entraîner les premières références
+scikit-learn sans utiliser le test final.
+
+#### Actions effectuées
+
+- authentification Databricks CLI avec le profil `bank-marketing` ;
+- synchronisation du Git Folder Databricks sur `main` ;
+- exécution de `03_preprocessing_silver.py` sur compute serverless ;
+- création de `src/bank_marketing/modeling.py` ;
+- création de `notebooks/databricks/04_modeling_baselines.py` ;
+- ajout de `tests/test_modeling.py` ;
+- exécution du notebook 04 dans Databricks ;
+- création de l'expérience MLflow
+  `/Users/abdourahman03@gmail.com/bank_marketing_baselines`.
+
+#### Résultats et preuves
+
+- table Silver créée : `workspace.default.bank_marketing_silver` ;
+- lignes Silver : 41 176 ;
+- cible Silver : 36 537 zéros et 4 639 uns ;
+- splits : 24 705 train, 8 235 validation et 8 236 test ;
+- `days_since_previous_contact=999` : 0 ligne ;
+- `previously_contacted` invalide : 0 ligne ;
+- tests locaux : 16 réussis, 1 ignoré parce que scikit-learn n'est pas installé
+  localement ;
+- notebook 04 terminé avec tous les cells en succès ;
+- 5 runs MLflow terminés : `dummy_prior`, `logistic_regression`,
+  `logistic_regression_balanced`, `decision_tree_balanced` et
+  `random_forest_balanced`.
+
+#### Premiers résultats de validation
+
+| Modèle | PR-AUC validation | ROC-AUC validation | F1 yes | Rappel yes | Lift top 10 % |
+|---|---:|---:|---:|---:|---:|
+| `random_forest_balanced` | 0.1180 | 0.5432 | 0.1572 | 0.2160 | 0.9205 |
+| `dummy_prior` | 0.1107 | 0.5000 | 0.0000 | 0.0000 | 0.2849 |
+| `logistic_regression_balanced` | 0.1041 | 0.4770 | 0.0663 | 0.0603 | 0.6246 |
+| `decision_tree_balanced` | 0.1030 | 0.4286 | 0.0971 | 0.1886 | 0.6465 |
+| `logistic_regression` | 0.0974 | 0.4766 | 0.0000 | 0.0000 | 0.4712 |
+
+#### Décisions prises et raisons
+
+- Conserver `unknown` comme catégorie pour cette première baseline.
+  L'imputation sera comparée seulement après observation des résultats de
+  validation.
+- Ne pas évaluer le test final dans le notebook 04. Le test reste réservé à la
+  dernière évaluation.
+- Utiliser PR-AUC, rappel de `yes` et lift comme signaux principaux, car
+  l'accuracy seule masque le déséquilibre de classe.
+
+#### Problèmes rencontrés
+
+- Le Databricks CLI ne peut pas lancer ce notebook en Jobs serverless dans ce
+  workspace. L'exécution a donc été faite dans l'interface Databricks, puis
+  vérifiée avec le CLI et MLflow.
+- Les premiers résultats sont faibles sur validation chronologique. Ce n'est pas
+  un échec : cela confirme que le protocole est difficile et qu'il faut
+  optimiser prudemment.
+
+#### Tâches restantes
+
+- comparer le traitement de `unknown` ;
+- ajuster les hyperparamètres et le seuil sur validation ;
+- analyser les erreurs et les sous-groupes ;
+- figer un modèle avant de consulter le test final.
+
+#### Prochaine action exacte
+
+Créer `05_tuning_mlflow.py` pour comparer quelques configurations contrôlées :
+traitement de `unknown`, poids de classes, hyperparamètres raisonnables et seuil
+métier sur validation.
 
 ---
 
@@ -494,16 +571,16 @@ baselines dans `04_modeling_baselines.py`.
 
 ### Prochaine étape immédiate
 
-1. `TERMINÉ` Publier les fichiers Databricks préparés sur GitHub dans la branche `codex/databricks-foundation`.
+1. `TERMINÉ` Publier les fichiers Databricks préparés sur GitHub dans une branche de fondation Databricks.
 2. `TERMINÉ` Relire et fusionner la pull request #1 dans `main`.
 3. `TERMINÉ` Tirer `main` dans le Databricks Git Folder.
 4. `TERMINÉ` Exécuter `00_configuration.py` sur compute serverless.
 5. `TERMINÉ` Téléverser `data/raw/bank-additional-full.csv` dans le Volume affiché.
 6. `TERMINÉ` Exécuter et valider `01_ingestion_bronze.py`.
 7. `TERMINÉ` Exécuter `02_eda.py` et conserver les premières observations.
-8. `EN COURS` Préparer et exécuter `03_preprocessing_silver.py`.
+8. `TERMINÉ` Préparer et exécuter `03_preprocessing_silver.py`.
 9. `À FAIRE` Initialiser DVC côté local pour la provenance du fichier.
-10. `À FAIRE` Valider les bibliothèques disponibles dans le compute serverless.
+10. `EN COURS` Valider les bibliothèques disponibles dans le compute serverless.
 
 ### Acquisition et validation du schéma
 
@@ -537,22 +614,22 @@ baselines dans `04_modeling_baselines.py`.
 - `TERMINÉ` Exclusion de `duration` des variables déployables.
 - `TERMINÉ` Traitement de `pdays=999`.
 - `EN COURS` Conserver `unknown` pour la baseline, puis comparer sur validation.
-- `À FAIRE` Encodage one-hot.
-- `À FAIRE` Standardisation des numériques.
-- `À FAIRE` Pipeline complète.
+- `TERMINÉ` Encodage one-hot.
+- `TERMINÉ` Standardisation des numériques.
+- `TERMINÉ` Pipeline complète.
 - `TERMINÉ` Tests de dimensions, colonnes et frontières chronologiques.
 - `TERMINÉ` Vérification statique de l'absence de `duration` dans les variables déployables.
 
 ### Modèles et expériences
 
-- `À FAIRE` DummyClassifier.
-- `À FAIRE` Régression logistique.
-- `À FAIRE` Arbre de décision.
-- `À FAIRE` Forêt aléatoire.
+- `TERMINÉ` DummyClassifier.
+- `TERMINÉ` Régression logistique.
+- `TERMINÉ` Arbre de décision.
+- `TERMINÉ` Forêt aléatoire.
 - `OPTIONNEL` k-NN.
-- `À FAIRE` MLflow Databricks avec `mlflow.autolog()` explicite.
-- `À FAIRE` Fonction commune d'évaluation.
-- `À FAIRE` Tableau comparatif.
+- `TERMINÉ` MLflow Databricks avec `mlflow.autolog()` explicite.
+- `TERMINÉ` Fonction commune d'évaluation.
+- `TERMINÉ` Tableau comparatif.
 - `À FAIRE` Recherche d'hyperparamètres.
 - `À FAIRE` Ajustement du seuil.
 - `À FAIRE` Sélection finale avant test.
@@ -585,8 +662,8 @@ baselines dans `04_modeling_baselines.py`.
 
 ## 7. Blocages actuels
 
-Aucun blocage actif. Une exécution manuelle du nouveau notebook Silver demeure
-nécessaire dans Databricks après sa publication et sa synchronisation.
+Aucun blocage actif. Le notebook 04 a dû être exécuté dans l'interface
+Databricks, car les Jobs serverless ne sont pas activés dans ce workspace.
 
 Éléments à surveiller :
 
@@ -662,7 +739,6 @@ Chaque nouvelle séance utilisera ce modèle :
 
 ## 10. Prochaine action exacte
 
-Publier la branche `codex/silver-preprocessing`, la synchroniser dans Databricks
-et exécuter `03_preprocessing_silver.py`. Vérifier les comptes affichés avant de
-commencer `04_modeling_baselines.py`. Le test final ne doit pas être utilisé pour
-choisir une transformation, un modèle ou un seuil.
+Créer `05_tuning_mlflow.py` pour améliorer les baselines sans toucher au test :
+comparer le traitement de `unknown`, quelques hyperparamètres raisonnables et un
+seuil métier fixé sur validation.

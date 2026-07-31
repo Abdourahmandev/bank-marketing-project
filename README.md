@@ -28,10 +28,16 @@ La variable `duration` sera étudiée, mais exclue du modèle final puisqu'elle 
 ## État
 
 Le CSV officiel a été téléversé dans Unity Catalog et les notebooks de
-configuration, d'ingestion Bronze et d'EDA ont été exécutés. Le prétraitement
-Silver est prêt à être exécuté : il déduplique les données, encode la cible,
-transforme `pdays=999` et crée les ensembles chronologiques. Aucun résultat de
-modèle n'est encore disponible.
+configuration, d'ingestion Bronze, d'EDA et de prétraitement Silver ont été
+exécutés. La table `workspace.default.bank_marketing_silver` contient 41 176
+lignes après retrait des 12 répétitions exactes, avec les splits chronologiques
+train/validation/test.
+
+Le notebook `04_modeling_baselines.py` a entraîné les premières références
+scikit-learn sans utiliser le test final : `DummyClassifier`, régressions
+logistiques, arbre de décision et forêt aléatoire. Les métriques sont suivies
+dans MLflow Databricks sous l'expérience
+`/Users/abdourahman03@gmail.com/bank_marketing_baselines`.
 
 ## Documentation de travail
 

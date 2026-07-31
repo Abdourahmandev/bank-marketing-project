@@ -389,7 +389,7 @@ Limites attendues : coût de prédiction sur 41 188 lignes, sensibilité à l'é
 - [x] P0.9 Ajouter le manifeste et la configuration Databricks initiale.
 - [ ] P0.10 Configurer DVC.
 - [ ] P0.11 Valider les bibliothèques du compute serverless et documenter les dépendances additionnelles.
-- [ ] P0.12 Valider MLflow géré avec `mlflow.autolog()`.
+- [x] P0.12 Valider MLflow géré avec `mlflow.autolog()`.
 
 **Critère de sortie :** projet clonable, structure compréhensible, environnement reproductible et plan approuvé.
 
@@ -435,10 +435,10 @@ Bronze est visible dans Unity Catalog.
 - [x] P3.6 Transformer le code sentinelle `pdays=999`.
 - [x] P3.7 Créer `previously_contacted` et `days_since_previous_contact`.
 - [x] P3.8 Définir les listes numériques et catégorielles déployables.
-- [ ] P3.9 Construire `ColumnTransformer`.
-- [ ] P3.10 Ajouter imputation, one-hot encoding et normalisation.
-- [ ] P3.11 Tester le pipeline sur un petit échantillon.
-- [ ] P3.12 Vérifier que les données de test ne sont jamais utilisées au `fit`.
+- [x] P3.9 Construire `ColumnTransformer`.
+- [x] P3.10 Ajouter imputation, one-hot encoding et normalisation.
+- [x] P3.11 Tester le pipeline sur un échantillon et dans Databricks.
+- [x] P3.12 Vérifier que les données de test ne sont jamais utilisées au `fit`.
 
 **Critère de sortie :** la même pipeline transforme entraînement, validation, test et nouvelles observations.
 
@@ -447,20 +447,20 @@ Bronze est visible dans Unity Catalog.
 - [x] P4.1 Créer les ensembles chronologiques 60/20/20.
 - [x] P4.2 Vérifier les proportions de classes dans chaque ensemble.
 - [x] P4.3 Conserver les positions source et les étiquettes de séparation.
-- [ ] P4.4 Entraîner `DummyClassifier`.
-- [ ] P4.5 Produire les métriques de référence.
-- [ ] P4.6 Montrer pourquoi l'accuracy seule est insuffisante.
+- [x] P4.4 Entraîner `DummyClassifier`.
+- [x] P4.5 Produire les métriques de référence.
+- [x] P4.6 Montrer pourquoi l'accuracy seule est insuffisante.
 
 **Critère de sortie :** toute amélioration est mesurée contre une référence explicite.
 
 ### Phase 5 — Modèles de première itération
 
-- [ ] P5.1 Entraîner la régression logistique.
-- [ ] P5.2 Entraîner l'arbre de décision.
-- [ ] P5.3 Entraîner la forêt aléatoire.
+- [x] P5.1 Entraîner la régression logistique.
+- [x] P5.2 Entraîner l'arbre de décision.
+- [x] P5.3 Entraîner la forêt aléatoire.
 - [ ] P5.4 Tester k-NN si raisonnable.
-- [ ] P5.5 Enregistrer paramètres, temps et métriques dans MLflow.
-- [ ] P5.6 Construire un tableau comparatif initial.
+- [x] P5.5 Enregistrer paramètres, temps et métriques dans MLflow.
+- [x] P5.6 Construire un tableau comparatif initial.
 - [ ] P5.7 Identifier biais, variance et surapprentissage.
 
 **Critère de sortie :** un modèle prometteur et un modèle interprétable sont identifiés sans toucher au test final.
