@@ -59,6 +59,15 @@ les plus importantes selon la forêt sont notamment `age`, `euribor3m`, `job`,
 `campaign`, `day_of_week` et `month`. Les importances ne sont pas interprétées
 comme des causes.
 
+Le notebook `08_inference_demo.py` a sauvegardé la pipeline finale avec joblib
+dans le Volume Unity Catalog :
+`/Volumes/workspace/default/bank_marketing/models/bank_marketing_final_pipeline.joblib`.
+Il recharge cet artefact, score 8 236 clients du split test et écrit la table
+Delta `workspace.default.bank_marketing_predictions`. La démonstration produit
+802 prédictions positives au seuil `0.525244`, avec une précision top 10 % de
+`0.4053` et un lift top 10 % de `1.3148`. L'expérience MLflow associée est
+`/Users/abdourahman03@gmail.com/bank_marketing_inference_demo`.
+
 ## Documentation de travail
 
 - [Plan d'action détaillé](plan_action.md)

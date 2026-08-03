@@ -504,15 +504,15 @@ Bronze est visible dans Unity Catalog.
 
 ### Phase 9 — Reproductibilité et démonstration
 
-- [ ] P9.1 Sérialiser la pipeline finale avec joblib.
-- [ ] P9.2 Écrire `predict.py`.
-- [ ] P9.3 Valider les entrées de prédiction.
-- [ ] P9.4 Ajouter des tests unitaires et un test de bout en bout.
+- [x] P9.1 Sérialiser la pipeline finale avec joblib.
+- [x] P9.2 Écrire `predict.py`.
+- [x] P9.3 Valider les entrées de prédiction.
+- [x] P9.4 Ajouter des tests unitaires et un test de bout en bout.
 - [ ] P9.5 Ajouter `params.yaml` et les commandes DVC nécessaires.
 - [ ] P9.6 Ajouter la GitHub Action minimale.
 - [ ] P9.7 Vérifier l'installation depuis un environnement propre.
 - [ ] P9.8 Compléter le README.
-- [ ] P9.9 Préparer une démonstration stable.
+- [x] P9.9 Préparer une démonstration stable.
 
 **Critère de sortie :** une personne peut reproduire l'entraînement et exécuter une prédiction en suivant le README.
 

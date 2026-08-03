@@ -49,12 +49,14 @@ Il doit être mis à jour après chaque séance de travail importante. Le plan c
 | MLflow | TERMINÉ | expériences baselines, tuning et évaluation finale enregistrées |
 | évaluation finale | TERMINÉ | notebook 06 exécuté une seule fois sur test chronologique |
 | interprétation | TERMINÉ | erreurs, importances, sous-groupes et limites analysés |
+| inférence et démonstration | TERMINÉ | pipeline joblib, `predict.py`, notebook 08 et table de prédictions créés |
 | présentation | À FAIRE | plan temporel défini, PowerPoint non créé |
 
-Estimation prudente de l'avancement total : **environ 75 %**. L'architecture,
+Estimation prudente de l'avancement total : **environ 82 %**. L'architecture,
 l'ingestion, l'EDA initiale, Silver, les baselines, le tuning et l'évaluation
-finale fonctionnent. L'interprétation est disponible. La prochaine étape est de
-sauvegarder la pipeline finale et préparer une démonstration de prédiction.
+finale fonctionnent. L'interprétation, la sérialisation joblib et la
+démonstration de prédiction sont disponibles. La prochaine étape est de terminer
+la reproductibilité formelle : DVC, CI minimale, dépendances et README final.
 
 ---
 
@@ -537,6 +539,74 @@ d'erreurs, variables importantes, sous-groupes et limites d'utilisation.
 
 Sérialiser la pipeline finale et créer la démonstration de prédiction.
 
+### Séance du 3 août 2026 — Sérialisation et démonstration de prédiction
+
+#### Objectif
+
+Rendre le modèle final réutilisable hors du notebook d'évaluation, puis produire
+une démonstration stable de scoring dans Databricks.
+
+#### Actions effectuées
+
+- création de `src/bank_marketing/predict.py` ;
+- ajout d'une validation des colonnes de prédiction et des valeurs numériques ;
+- ajout des fonctions `score_customers`, `top_recommendations`,
+  `save_pipeline` et `load_pipeline` ;
+- ajout de tests unitaires pour le schéma, la validation, le scoring, le ranking
+  et le roundtrip joblib ;
+- création du notebook Databricks `08_inference_demo.py` ;
+- sauvegarde de la pipeline finale dans le Volume Unity Catalog ;
+- écriture de la table Delta `workspace.default.bank_marketing_predictions` ;
+- journalisation MLflow de la démonstration et des artefacts.
+
+#### Résultats et preuves
+
+- commit exécuté dans Databricks :
+  `d016c170472c27ceabb302441f626af56ceb4f88` ;
+- run Jobs Databricks parent : `208346063817173` ;
+- run Jobs Databricks tâche : `255506863228529` ;
+- expérience MLflow :
+  `/Users/abdourahman03@gmail.com/bank_marketing_inference_demo`,
+  ID `4289094110911163` ;
+- run MLflow : `febd0ffd324e40eaa31a76ecfeaad4f9` ;
+- pipeline joblib :
+  `/Volumes/workspace/default/bank_marketing/models/bank_marketing_final_pipeline.joblib` ;
+- schéma de prédiction :
+  `/Volumes/workspace/default/bank_marketing/models/prediction_schema.json` ;
+- table de prédictions :
+  `workspace.default.bank_marketing_predictions` ;
+- lignes scorées : `8236` ;
+- prédictions positives au seuil `0.525244344106127` : `802` ;
+- précision top 10 % : `0.4053` ;
+- lift top 10 % : `1.3148` ;
+- validation locale : `24 passed, 5 skipped`.
+
+#### Décisions prises et raisons
+
+- Conserver la même stratégie `train_only` que l'évaluation finale afin que le
+  modèle sérialisé corresponde aux métriques déjà présentées.
+- Sauvegarder le `joblib` dans le Volume Unity Catalog plutôt que dans Git, car
+  le modèle est un artefact généré.
+- Garder la démonstration dans Databricks plutôt que créer une interface
+  supplémentaire, afin de privilégier une exécution stable et explicable.
+
+#### Problèmes rencontrés
+
+- Aucun blocage. La liste directe du Volume a confirmé la présence de
+  `bank_marketing_final_pipeline.joblib` et `prediction_schema.json`.
+
+#### Tâches restantes
+
+- ajouter `params.yaml` et la partie DVC locale ;
+- ajouter une GitHub Action minimale ;
+- documenter les dépendances et le lancement depuis un environnement propre ;
+- finaliser le README et préparer le PowerPoint.
+
+#### Prochaine action exacte
+
+Ajouter `params.yaml`, formaliser les commandes DVC et créer la GitHub Action
+minimale.
+
 ---
 
 ## 4. Registre des décisions
@@ -749,6 +819,18 @@ Sérialiser la pipeline finale et créer la démonstration de prédiction.
 - **Conséquence :** l'évaluation test mesure exactement le candidat figé à la
   fin du notebook 05.
 
+### DEC-027 — Sauvegarder la pipeline finale dans un Volume Unity Catalog
+
+- **Date :** 3 août 2026
+- **État :** ACCEPTÉE
+- **Décision :** sérialiser la pipeline finale avec joblib dans
+  `/Volumes/workspace/default/bank_marketing/models/`.
+- **Raison :** le modèle est un artefact généré et ne doit pas être versionné
+  directement dans Git. Le Volume reste accessible depuis Databricks et le run
+  MLflow conserve la trace.
+- **Conséquence :** la démonstration recharge l'artefact joblib depuis le Volume
+  avant de produire la table Delta de prédictions.
+
 ---
 
 ## 5. Décisions encore ouvertes
@@ -792,9 +874,12 @@ Sérialiser la pipeline finale et créer la démonstration de prédiction.
 
 ### OUV-006 — Interface de démonstration
 
-- **État :** OPTIONNEL
+- **État :** RÉSOLUE pour le produit minimum viable
 - **Options :** ligne de commande, notebook, Streamlit, FastAPI.
-- **Choix provisoire :** ligne de commande stable ; interface seulement si le cœur est terminé.
+- **Décision :** notebook Databricks stable avec code réutilisable dans
+  `src/bank_marketing/predict.py`.
+- **Preuve :** `08_inference_demo.py` sauvegarde le modèle, le recharge, score
+  le test et écrit une table Delta de prédictions.
 
 ---
 
@@ -879,13 +964,13 @@ Sérialiser la pipeline finale et créer la démonstration de prédiction.
 
 ### Livraison
 
-- `À FAIRE` Sauvegarde de la pipeline.
-- `À FAIRE` Script de prédiction.
-- `À FAIRE` Tests automatisés.
+- `TERMINÉ` Sauvegarde de la pipeline.
+- `TERMINÉ` Script de prédiction.
+- `TERMINÉ` Tests automatisés.
 - `À FAIRE` GitHub Action.
 - `À FAIRE` README final.
 - `À FAIRE` PowerPoint.
-- `À FAIRE` Démonstration.
+- `TERMINÉ` Démonstration.
 - `À FAIRE` Répétition de 15 minutes.
 - `À FAIRE` Vérification finale des citations.
 
@@ -970,5 +1055,5 @@ Chaque nouvelle séance utilisera ce modèle :
 
 ## 10. Prochaine action exacte
 
-Sérialiser la pipeline finale avec joblib, puis créer le script ou notebook de
-prédiction pour la démonstration.
+Ajouter `params.yaml`, formaliser les commandes DVC et créer la GitHub Action
+minimale.
