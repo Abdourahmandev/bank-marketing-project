@@ -335,6 +335,63 @@ Créer `05_tuning_mlflow.py` pour comparer quelques configurations contrôlées 
 traitement de `unknown`, poids de classes, hyperparamètres raisonnables et seuil
 métier sur validation.
 
+### Séance du 3 août 2026 — Préparation du tuning MLflow
+
+#### Objectif
+
+Implémenter le notebook `05_tuning_mlflow.py` pour améliorer les baselines sans
+utiliser le jeu de test final.
+
+#### Actions effectuées
+
+- ajout de configurations d'optimisation contrôlées dans
+  `src/bank_marketing/modeling.py` ;
+- ajout de deux stratégies pour `unknown` : conservation comme catégorie et
+  conversion en valeur manquante avant imputation ;
+- ajout d'une fonction de seuil métier basée sur les 10 % meilleurs scores de
+  validation ;
+- création du notebook Databricks `05_tuning_mlflow.py` ;
+- ajout de tests unitaires pour la transformation de `unknown`, le seuil métier
+  et l'unicité des configurations.
+
+#### Résultats et preuves
+
+- le notebook 05 charge Silver, valide les volumes attendus et conserve le test
+  hors des métriques ;
+- les configurations comparent régression logistique, arbre de décision et forêt
+  aléatoire avec quelques hyperparamètres raisonnables ;
+- les exécutions sont prévues dans l'expérience MLflow
+  `/Users/<utilisateur>/bank_marketing_tuning` ;
+- validation locale : `18 passed, 2 skipped`.
+
+#### Décisions prises et raisons
+
+- Ne pas lancer une recherche exhaustive : le dataset est petit, mais le projet
+  doit rester explicable et défendable.
+- Classer les candidats avec PR-AUC validation, lift top 10 %, rappel `yes`, puis
+  F1 `yes`.
+- Fixer le seuil métier sur validation avec un budget de 10 % d'appels.
+
+#### Problèmes rencontrés
+
+- Le notebook est prêt localement, mais son exécution Databricks dépend de la
+  synchronisation du Git Folder. Le workspace avait déjà signalé un conflit lié
+  aux fichiers importés manuellement avant le dernier push.
+
+#### Tâches restantes
+
+- synchroniser le Git Folder Databricks avec `main` ;
+- exécuter `05_tuning_mlflow.py` dans Databricks ;
+- consigner le modèle et le seuil retenus avec les métriques réelles de
+  validation ;
+- préparer `06_final_evaluation.py`.
+
+#### Prochaine action exacte
+
+Résoudre la synchronisation du Git Folder Databricks, exécuter
+`05_tuning_mlflow.py`, puis figer le modèle et le seuil avant toute consultation
+du test final.
+
 ---
 
 ## 4. Registre des décisions
@@ -522,16 +579,29 @@ métier sur validation.
 - **Raison :** 999 est un code métier, pas une durée réelle ; l'indicateur
   distingue l'absence de contact d'un véritable délai de zéro jour.
 
+### DEC-025 — Optimiser avec une grille courte avant le test
+
+- **Date :** 3 août 2026
+- **État :** ACCEPTÉE POUR L'IMPLÉMENTATION
+- **Décision :** comparer un nombre limité de configurations dans
+  `05_tuning_mlflow.py` : traitement de `unknown`, poids de classes,
+  régularisation/profondeur minimale et seuil métier sur validation.
+- **Raison :** le projet doit rester reproductible, explicable et aligné avec le
+  cours. Une recherche exhaustive augmenterait le coût et le risque de choisir
+  un modèle opportuniste.
+- **Conséquence :** le modèle final sera choisi avant toute évaluation du test
+  chronologique.
+
 ---
 
 ## 5. Décisions encore ouvertes
 
 ### OUV-001 — Traitement de `unknown`
 
-- **État :** À FAIRE
+- **État :** EN COURS
 - **Options :** conserver comme catégorie ; convertir en valeur manquante et imputer ; comparer les deux.
-- **Choix provisoire :** conserver comme catégorie dans la première baseline.
-- **Pourquoi le choix reste ouvert :** la documentation officielle autorise les deux interprétations. La validation et la signification métier doivent guider la décision.
+- **Choix provisoire :** les deux traitements sont implémentés dans le notebook 05.
+- **Pourquoi le choix reste ouvert :** la décision finale dépend des métriques de validation exécutées dans Databricks.
 
 ### OUV-002 — Traitement des 12 doublons
 
@@ -543,9 +613,9 @@ métier sur validation.
 
 ### OUV-003 — Seuil métier
 
-- **État :** À FAIRE
+- **État :** EN COURS
 - **Options :** 0,5 ; maximiser F1 ; atteindre un rappel cible ; sélectionner les 10 % meilleurs scores.
-- **Choix provisoire :** présenter les résultats pour un budget de 10 % d'appels et un seuil optimisé sur validation.
+- **Choix provisoire :** sélectionner les 10 % meilleurs scores de validation et enregistrer le seuil correspondant.
 
 ### OUV-004 — Réentraînement final
 
@@ -630,8 +700,8 @@ métier sur validation.
 - `TERMINÉ` MLflow Databricks avec `mlflow.autolog()` explicite.
 - `TERMINÉ` Fonction commune d'évaluation.
 - `TERMINÉ` Tableau comparatif.
-- `À FAIRE` Recherche d'hyperparamètres.
-- `À FAIRE` Ajustement du seuil.
+- `EN COURS` Recherche d'hyperparamètres.
+- `EN COURS` Ajustement du seuil.
 - `À FAIRE` Sélection finale avant test.
 
 ### Évaluation et interprétation
@@ -739,6 +809,6 @@ Chaque nouvelle séance utilisera ce modèle :
 
 ## 10. Prochaine action exacte
 
-Créer `05_tuning_mlflow.py` pour améliorer les baselines sans toucher au test :
-comparer le traitement de `unknown`, quelques hyperparamètres raisonnables et un
-seuil métier fixé sur validation.
+Synchroniser le Git Folder Databricks avec `main`, exécuter
+`05_tuning_mlflow.py`, puis consigner le modèle et le seuil retenus avant
+l'évaluation unique du test final dans `06_final_evaluation.py`.

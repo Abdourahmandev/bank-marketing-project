@@ -21,6 +21,9 @@ from .preprocessing import (
 
 RANDOM_STATE = 42
 VALIDATION_BUDGET_FRACTION = 0.10
+UNKNOWN_CATEGORY_STRATEGY = "keep_unknown"
+UNKNOWN_MISSING_STRATEGY = "unknown_as_missing"
+UNKNOWN_STRATEGIES = (UNKNOWN_CATEGORY_STRATEGY, UNKNOWN_MISSING_STRATEGY)
 
 
 @dataclass(frozen=True)
@@ -42,6 +45,16 @@ class ModelSpec:
 
     name: str
     estimator: Any
+    description: str
+
+
+@dataclass(frozen=True)
+class TuningSpec:
+    """Configuration controlee pour le notebook d'optimisation."""
+
+    name: str
+    estimator: Any
+    unknown_strategy: str
     description: str
 
 
@@ -125,13 +138,36 @@ def split_silver_frame(frame: pd.DataFrame) -> ModelingSplits:
     )
 
 
-def build_preprocessor() -> Any:
+def replace_unknown_with_missing(values: Any) -> Any:
+    """Remplace la categorie litterale unknown par une valeur manquante."""
+
+    if isinstance(values, pd.DataFrame):
+        return values.replace("unknown", np.nan)
+    if isinstance(values, pd.Series):
+        return values.replace("unknown", np.nan)
+
+    array = np.asarray(values, dtype=object).copy()
+    array[array == "unknown"] = np.nan
+    return array
+
+
+def build_preprocessor(
+    *,
+    unknown_strategy: str = UNKNOWN_CATEGORY_STRATEGY,
+) -> Any:
     """Construit le ColumnTransformer ajuste uniquement sur train."""
 
     from sklearn.compose import ColumnTransformer
     from sklearn.impute import SimpleImputer
     from sklearn.pipeline import Pipeline
-    from sklearn.preprocessing import OneHotEncoder, StandardScaler
+    from sklearn.preprocessing import (
+        FunctionTransformer,
+        OneHotEncoder,
+        StandardScaler,
+    )
+
+    if unknown_strategy not in UNKNOWN_STRATEGIES:
+        raise ValueError(f"Strategie unknown inconnue: {unknown_strategy}")
 
     numeric_transformer = Pipeline(
         steps=[
@@ -139,12 +175,25 @@ def build_preprocessor() -> Any:
             ("scaler", StandardScaler()),
         ]
     )
-    categorical_transformer = Pipeline(
-        steps=[
+    categorical_steps: list[tuple[str, Any]] = []
+    if unknown_strategy == UNKNOWN_MISSING_STRATEGY:
+        categorical_steps.append(
+            (
+                "unknown_to_missing",
+                FunctionTransformer(
+                    replace_unknown_with_missing,
+                    validate=False,
+                    feature_names_out="one-to-one",
+                ),
+            )
+        )
+    categorical_steps.extend(
+        [
             ("imputer", SimpleImputer(strategy="most_frequent")),
             ("one_hot", OneHotEncoder(handle_unknown="ignore")),
         ]
     )
+    categorical_transformer = Pipeline(steps=categorical_steps)
 
     return ColumnTransformer(
         transformers=[
@@ -212,17 +261,163 @@ def baseline_model_specs(random_state: int = RANDOM_STATE) -> tuple[ModelSpec, .
     )
 
 
-def build_model_pipeline(model_spec: ModelSpec) -> Any:
+def controlled_tuning_specs(
+    random_state: int = RANDOM_STATE,
+) -> tuple[TuningSpec, ...]:
+    """Retourne une grille courte et defendable pour l'optimisation."""
+
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.tree import DecisionTreeClassifier
+
+    base_specs = (
+        (
+            "logistic_unweighted_c_1_0",
+            LogisticRegression(C=1.0, max_iter=1000, random_state=random_state),
+            "Regression logistique sans poids de classes, C=1.0.",
+        ),
+        (
+            "logistic_balanced_c_0_3",
+            LogisticRegression(
+                C=0.3,
+                max_iter=1000,
+                class_weight="balanced",
+                random_state=random_state,
+            ),
+            "Regression logistique equilibree, regularisation plus forte.",
+        ),
+        (
+            "logistic_balanced_c_1_0",
+            LogisticRegression(
+                C=1.0,
+                max_iter=1000,
+                class_weight="balanced",
+                random_state=random_state,
+            ),
+            "Regression logistique equilibree, regularisation standard.",
+        ),
+        (
+            "decision_tree_depth_4_leaf_100",
+            DecisionTreeClassifier(
+                max_depth=4,
+                min_samples_leaf=100,
+                class_weight="balanced",
+                random_state=random_state,
+            ),
+            "Arbre plus contraint pour reduire la variance.",
+        ),
+        (
+            "decision_tree_depth_8_leaf_50",
+            DecisionTreeClassifier(
+                max_depth=8,
+                min_samples_leaf=50,
+                class_weight="balanced",
+                random_state=random_state,
+            ),
+            "Arbre moins contraint pour tester le biais.",
+        ),
+        (
+            "random_forest_depth_8_leaf_50",
+            RandomForestClassifier(
+                n_estimators=160,
+                max_depth=8,
+                min_samples_leaf=50,
+                class_weight="balanced_subsample",
+                n_jobs=-1,
+                random_state=random_state,
+            ),
+            "Foret aleatoire regularisee, arbres peu profonds.",
+        ),
+        (
+            "random_forest_depth_12_leaf_25",
+            RandomForestClassifier(
+                n_estimators=200,
+                max_depth=12,
+                min_samples_leaf=25,
+                class_weight="balanced_subsample",
+                n_jobs=-1,
+                random_state=random_state,
+            ),
+            "Foret aleatoire moins contrainte pour comparer le compromis.",
+        ),
+    )
+
+    specs: list[TuningSpec] = []
+    for unknown_strategy in UNKNOWN_STRATEGIES:
+        suffix = (
+            "unknown_category"
+            if unknown_strategy == UNKNOWN_CATEGORY_STRATEGY
+            else "unknown_missing"
+        )
+        for base_name, estimator, description in base_specs:
+            specs.append(
+                TuningSpec(
+                    name=f"{base_name}_{suffix}",
+                    estimator=estimator,
+                    unknown_strategy=unknown_strategy,
+                    description=description,
+                )
+            )
+    return tuple(specs)
+
+
+def build_model_pipeline(
+    model_spec: ModelSpec | TuningSpec,
+    *,
+    unknown_strategy: str | None = None,
+) -> Any:
     """Assemble le pretraitement et l'estimateur dans une pipeline sklearn."""
 
+    from sklearn.base import clone
     from sklearn.pipeline import Pipeline
+
+    resolved_unknown_strategy = unknown_strategy or getattr(
+        model_spec,
+        "unknown_strategy",
+        UNKNOWN_CATEGORY_STRATEGY,
+    )
 
     return Pipeline(
         steps=[
-            ("preprocessor", build_preprocessor()),
-            ("model", model_spec.estimator),
+            (
+                "preprocessor",
+                build_preprocessor(unknown_strategy=resolved_unknown_strategy),
+            ),
+            ("model", clone(model_spec.estimator)),
         ]
     )
+
+
+def threshold_for_top_budget(
+    y_score: pd.Series | np.ndarray,
+    *,
+    budget_fraction: float = VALIDATION_BUDGET_FRACTION,
+) -> float:
+    """Retourne le seuil qui couvre le budget des meilleurs scores."""
+
+    if not 0 < budget_fraction <= 1:
+        raise ValueError("budget_fraction doit etre dans l'intervalle ]0, 1].")
+
+    score_array = np.asarray(y_score, dtype=float)
+    if score_array.size == 0:
+        raise ValueError("y_score ne peut pas etre vide.")
+    if not np.isfinite(score_array).all():
+        raise ValueError("y_score contient une valeur non finie.")
+
+    k = max(1, int(math.ceil(score_array.size * budget_fraction)))
+    ranked_indices = np.lexsort((np.arange(score_array.size), -score_array))
+    return float(score_array[ranked_indices[k - 1]])
+
+
+def predictions_from_threshold(
+    y_score: pd.Series | np.ndarray,
+    threshold: float,
+) -> np.ndarray:
+    """Convertit des scores de probabilite en classes avec un seuil explicite."""
+
+    if not math.isfinite(float(threshold)):
+        raise ValueError("threshold doit etre fini.")
+    return (np.asarray(y_score, dtype=float) >= float(threshold)).astype("int8")
 
 
 def positive_class_scores(fitted_pipeline: Any, features: pd.DataFrame) -> np.ndarray:

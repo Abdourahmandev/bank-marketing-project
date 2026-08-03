@@ -39,6 +39,11 @@ logistiques, arbre de décision et forêt aléatoire. Les métriques sont suivie
 dans MLflow Databricks sous l'expérience
 `/Users/abdourahman03@gmail.com/bank_marketing_baselines`.
 
+Le notebook `05_tuning_mlflow.py` est prêt pour l'optimisation contrôlée :
+comparaison du traitement de `unknown`, hyperparamètres raisonnables, seuil
+métier fixé sur validation et journalisation MLflow sous une expérience dédiée.
+Le test final reste réservé au notebook `06_final_evaluation.py`.
+
 ## Documentation de travail
 
 - [Plan d'action détaillé](plan_action.md)

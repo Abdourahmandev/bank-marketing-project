@@ -467,7 +467,7 @@ Bronze est visible dans Unity Catalog.
 
 ### Phase 6 — Optimisation et sélection
 
-- [ ] P6.1 Définir des espaces d'hyperparamètres raisonnables.
+- [x] P6.1 Définir des espaces d'hyperparamètres raisonnables.
 - [ ] P6.2 Utiliser validation chronologique ou recherche contrôlée.
 - [ ] P6.3 Comparer poids de classes et seuils.
 - [ ] P6.4 Choisir le modèle selon performance, robustesse, coût et interprétabilité.

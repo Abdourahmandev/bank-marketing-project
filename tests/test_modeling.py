@@ -14,8 +14,15 @@ if str(SOURCE_ROOT) not in sys.path:
     sys.path.insert(0, str(SOURCE_ROOT))
 
 from bank_marketing.modeling import (  # noqa: E402
+    UNKNOWN_CATEGORY_STRATEGY,
+    UNKNOWN_MISSING_STRATEGY,
+    build_model_pipeline,
+    controlled_tuning_specs,
     evaluate_binary_predictions,
+    predictions_from_threshold,
+    replace_unknown_with_missing,
     split_silver_frame,
+    threshold_for_top_budget,
 )
 from bank_marketing.preprocessing import (  # noqa: E402
     DEPLOYMENT_FEATURES,
@@ -112,3 +119,52 @@ def test_evaluate_binary_predictions_includes_ranking_metrics() -> None:
     assert metrics["top_10_percent_count"] == 2
     assert metrics["top_10_percent_precision"] == 1.0
     assert metrics["top_10_percent_recall"] == 1.0
+
+
+def test_replace_unknown_with_missing_preserves_shape() -> None:
+    frame = pd.DataFrame(
+        {
+            "job": ["admin.", "unknown"],
+            "housing": ["unknown", "yes"],
+        }
+    )
+
+    transformed = replace_unknown_with_missing(frame)
+
+    assert transformed.shape == frame.shape
+    assert transformed.isna().sum().to_dict() == {"job": 1, "housing": 1}
+    assert transformed.loc[0, "job"] == "admin."
+
+
+def test_threshold_for_top_budget_selects_high_score_cutoff() -> None:
+    scores = pd.Series([0.1, 0.9, 0.8, 0.2])
+
+    threshold = threshold_for_top_budget(scores, budget_fraction=0.5)
+    predictions = predictions_from_threshold(scores, threshold)
+
+    assert threshold == 0.8
+    assert predictions.tolist() == [0, 1, 1, 0]
+
+
+def test_controlled_tuning_specs_are_unique_and_compare_unknown_strategies() -> None:
+    pytest.importorskip("sklearn")
+
+    specs = controlled_tuning_specs()
+    names = [spec.name for spec in specs]
+    strategies = {spec.unknown_strategy for spec in specs}
+
+    assert len(names) == len(set(names))
+    assert UNKNOWN_CATEGORY_STRATEGY in strategies
+    assert UNKNOWN_MISSING_STRATEGY in strategies
+
+
+def test_build_model_pipeline_clones_estimator_instances() -> None:
+    pytest.importorskip("sklearn")
+
+    spec = controlled_tuning_specs()[0]
+    first_pipeline = build_model_pipeline(spec)
+    second_pipeline = build_model_pipeline(spec)
+
+    assert first_pipeline.named_steps["model"] is not spec.estimator
+    assert second_pipeline.named_steps["model"] is not spec.estimator
+    assert first_pipeline.named_steps["model"] is not second_pipeline.named_steps["model"]
