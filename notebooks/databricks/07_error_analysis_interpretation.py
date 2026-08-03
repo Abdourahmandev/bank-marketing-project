@@ -17,6 +17,7 @@
 
 from __future__ import annotations
 
+import json
 import math
 
 import matplotlib.pyplot as plt
@@ -450,6 +451,11 @@ with mlflow.start_run(run_name="error_analysis_interpretation"):
     mlflow.log_param("business_threshold", FINAL_BUSINESS_THRESHOLD)
     mlflow.log_param("refit_strategy", FINAL_REFIT_STRATEGY)
     mlflow.log_param("test_rows", len(test_pdf))
+    mlflow.log_param("top_native_features", ", ".join(top_native_features[:8]))
+    mlflow.log_param(
+        "top_permutation_features",
+        ", ".join(top_permutation_features[:8]),
+    )
     mlflow.log_metric("top_10_precision", top_10_precision)
     mlflow.log_metric("overall_positive_rate", overall_positive_rate)
     mlflow.log_metric("top_10_lift", top_10_lift)
@@ -490,3 +496,7 @@ with mlflow.start_run(run_name="error_analysis_interpretation"):
 # MAGIC ## Prochaine etape
 # MAGIC
 # MAGIC Construire la demonstration de prediction et sauvegarder la pipeline finale.
+
+# COMMAND ----------
+
+dbutils.notebook.exit(json.dumps(interpretation_summary, ensure_ascii=False))
