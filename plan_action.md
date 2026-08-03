@@ -252,7 +252,8 @@ bank-marketing-project/
 │       ├── 04_modeling_baselines.py
 │       ├── 05_tuning_mlflow.py
 │       ├── 06_final_evaluation.py
-│       └── 07_inference_demo.py
+│       ├── 07_error_analysis_interpretation.py
+│       └── 08_inference_demo.py
 ├── src/
 │   └── bank_marketing/
 │       ├── __init__.py
@@ -491,13 +492,13 @@ Bronze est visible dans Unity Catalog.
 
 ### Phase 8 — Interprétation, erreurs et responsabilité
 
-- [ ] P8.1 Examiner faux positifs et faux négatifs.
-- [ ] P8.2 Étudier les prédicteurs importants.
-- [ ] P8.3 Comparer coefficients, arbre et permutation importance.
-- [ ] P8.4 Examiner la performance par sous-groupes pertinents.
-- [ ] P8.5 Identifier risques de discrimination ou de variables proxy.
-- [ ] P8.6 Distinguer corrélation et causalité.
-- [ ] P8.7 Décrire limites et conditions d'utilisation.
+- [x] P8.1 Examiner faux positifs et faux négatifs.
+- [x] P8.2 Étudier les prédicteurs importants.
+- [x] P8.3 Comparer importance native et permutation importance.
+- [x] P8.4 Examiner la performance par sous-groupes pertinents.
+- [x] P8.5 Identifier risques de discrimination ou de variables proxy.
+- [x] P8.6 Distinguer corrélation et causalité.
+- [x] P8.7 Décrire limites et conditions d'utilisation.
 
 **Critère de sortie :** il est possible d'expliquer ce que fait le modèle, ce qu'il ne prouve pas et où il peut échouer.
 

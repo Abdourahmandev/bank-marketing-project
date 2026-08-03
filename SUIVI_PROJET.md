@@ -48,12 +48,13 @@ Il doit être mis à jour après chaque séance de travail importante. Le plan c
 | modélisation | TERMINÉ | baselines, tuning et sélection finale exécutés |
 | MLflow | TERMINÉ | expériences baselines, tuning et évaluation finale enregistrées |
 | évaluation finale | TERMINÉ | notebook 06 exécuté une seule fois sur test chronologique |
+| interprétation | TERMINÉ | erreurs, importances, sous-groupes et limites analysés |
 | présentation | À FAIRE | plan temporel défini, PowerPoint non créé |
 
-Estimation prudente de l'avancement total : **environ 65 %**. L'architecture,
+Estimation prudente de l'avancement total : **environ 75 %**. L'architecture,
 l'ingestion, l'EDA initiale, Silver, les baselines, le tuning et l'évaluation
-finale fonctionnent. La prochaine étape est d'expliquer les erreurs, les
-variables importantes, les sous-groupes et les limites métier.
+finale fonctionnent. L'interprétation est disponible. La prochaine étape est de
+sauvegarder la pipeline finale et préparer une démonstration de prédiction.
 
 ---
 
@@ -470,6 +471,72 @@ sans modifier le modèle après consultation des résultats.
 Ajouter une analyse d'erreurs et d'interprétation : faux positifs, faux
 négatifs, importance des variables et limites métier.
 
+### Séance du 3 août 2026 — Analyse des erreurs et interprétation
+
+#### Objectif
+
+Expliquer le comportement du modèle final après l'évaluation du test : types
+d'erreurs, variables importantes, sous-groupes et limites d'utilisation.
+
+#### Actions effectuées
+
+- création du notebook Databricks `07_error_analysis_interpretation.py` ;
+- reconstruction du modèle final avec la même configuration que le notebook 06 ;
+- classification des lignes test en vrais positifs, faux positifs, faux
+  négatifs et vrais négatifs ;
+- extraction d'exemples de faux positifs et faux négatifs à score élevé ;
+- calcul de l'importance native de la forêt aléatoire, regroupée par variable
+  d'origine ;
+- calcul de l'importance par permutation sur le test ;
+- calcul de métriques par sous-groupes : `job`, `education`, `marital`,
+  `default`, `housing`, `loan`, `contact`, `month`, `poutcome` et
+  `previously_contacted` ;
+- journalisation des tableaux et de la figure d'importance dans MLflow.
+
+#### Résultats et preuves
+
+- commit exécuté dans Databricks : `a086e419b27a1aaf972f96bd4d15a9a92c8c58b0` ;
+- run Jobs Databricks : `349413942583176` ;
+- expérience MLflow :
+  `/Users/abdourahman03@gmail.com/bank_marketing_interpretation`,
+  ID `3699631843590218` ;
+- run MLflow : `69da0d26d9dc484882c3d26d35bcf067` ;
+- erreurs test : TP `324`, FP `478`, FN `2215`, TN `5219` ;
+- précision top 10 % : `0.4053` contre un taux positif test de `0.3083`,
+  soit un lift `1.3148` ;
+- principales variables selon importance native : `age`, `euribor3m`, `job`,
+  `campaign`, `day_of_week`, `month`, `education`, `marital` ;
+- principales variables selon permutation importance : `month`, `day_of_week`,
+  `age`, `campaign`, `education`, `poutcome`, `marital`, `housing` ;
+- validation locale : `18 passed, 4 skipped`.
+
+#### Décisions prises et raisons
+
+- Présenter les importances comme des signaux prédictifs, pas comme des causes.
+- Ne pas cacher les faux négatifs : le modèle manque encore 2 215 souscriptions
+  dans le test avec le seuil retenu.
+- Présenter les variables économiques et de contact comme potentiellement liées
+  à la période historique 2008-2010, donc à surveiller hors contexte.
+- Conserver l'analyse par sous-groupes comme outil de risque et de discussion,
+  pas comme preuve d'équité suffisante.
+
+#### Problèmes rencontrés
+
+- Les artefacts MLflow sont listables, mais leur copie directe depuis DBFS root
+  est bloquée dans ce workspace. Le notebook retourne donc aussi un résumé JSON
+  avec `dbutils.notebook.exit(...)`.
+
+#### Tâches restantes
+
+- sauvegarder la pipeline finale ;
+- créer un script ou notebook de prédiction ;
+- préparer une démonstration utilisable ;
+- finaliser la documentation et la présentation.
+
+#### Prochaine action exacte
+
+Sérialiser la pipeline finale et créer la démonstration de prédiction.
+
 ---
 
 ## 4. Registre des décisions
@@ -805,10 +872,10 @@ négatifs, importance des variables et limites métier.
 - `TERMINÉ` ROC-AUC et courbe ROC.
 - `TERMINÉ` PR-AUC et courbe précision-rappel.
 - `TERMINÉ` Lift et métriques top 10 %.
-- `À FAIRE` Analyse des erreurs.
-- `À FAIRE` Importances et coefficients.
-- `À FAIRE` Analyse des sous-groupes.
-- `À FAIRE` Limites, biais et conditions d'utilisation.
+- `TERMINÉ` Analyse des erreurs.
+- `TERMINÉ` Importances et explication du modèle.
+- `TERMINÉ` Analyse des sous-groupes.
+- `TERMINÉ` Limites, biais et conditions d'utilisation.
 
 ### Livraison
 
@@ -903,5 +970,5 @@ Chaque nouvelle séance utilisera ce modèle :
 
 ## 10. Prochaine action exacte
 
-Ajouter l'analyse d'erreurs et d'interprétation : faux positifs, faux négatifs,
-importance des variables, sous-groupes et limites métier.
+Sérialiser la pipeline finale avec joblib, puis créer le script ou notebook de
+prédiction pour la démonstration.

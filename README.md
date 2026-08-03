@@ -52,6 +52,13 @@ chronologique sous l'expérience
 PR-AUC `0.3491`, ROC-AUC `0.5578`, rappel `yes` `0.1276`, précision `yes`
 `0.4040`, F1 `yes` `0.1940` et lift top 10 % `1.3148`.
 
+Le notebook `07_error_analysis_interpretation.py` a analysé les erreurs, les
+variables importantes, les sous-groupes et les limites sous l'expérience
+`/Users/abdourahman03@gmail.com/bank_marketing_interpretation`. Les variables
+les plus importantes selon la forêt sont notamment `age`, `euribor3m`, `job`,
+`campaign`, `day_of_week` et `month`. Les importances ne sont pas interprétées
+comme des causes.
+
 ## Documentation de travail
 
 - [Plan d'action détaillé](plan_action.md)
