@@ -10,7 +10,7 @@
 # MAGIC
 # MAGIC - comparer deux traitements de `unknown` ;
 # MAGIC - tester quelques hyperparametres raisonnables ;
-# MAGIC - choisir un candidat selon PR-AUC, lift top 10 % et rappel de `yes` ;
+# MAGIC - choisir un candidat selon lift top 10 %, PR-AUC et rappel de `yes` ;
 # MAGIC - fixer un seuil metier sur validation pour un budget de 10 % d'appels.
 
 # COMMAND ----------
@@ -241,8 +241,8 @@ for spec in tuning_specs:
 results_pdf = pd.DataFrame(results_rows)
 
 selection_sort_columns = [
-    "validation_average_precision",
     "validation_top_10_percent_lift",
+    "validation_average_precision",
     "validation_recall_yes",
     "validation_f1_yes",
 ]
@@ -298,7 +298,7 @@ selection_summary = {
     "selected_model": best_row["model"],
     "unknown_strategy": best_row["unknown_strategy"],
     "estimator": best_row["estimator"],
-    "selection_rule": "validation_average_precision, then top_10_lift, recall_yes, f1_yes",
+    "selection_rule": "validation_top_10_lift, then average_precision, recall_yes, f1_yes",
     "business_threshold_rule": "validation_top_10_percent_budget",
     "business_threshold": float(best_row["business_threshold"]),
     "validation_average_precision": float(best_row["validation_average_precision"]),

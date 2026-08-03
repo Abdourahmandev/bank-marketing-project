@@ -368,8 +368,8 @@ utiliser le jeu de test final.
 
 - Ne pas lancer une recherche exhaustive : le dataset est petit, mais le projet
   doit rester explicable et défendable.
-- Classer les candidats avec PR-AUC validation, lift top 10 %, rappel `yes`, puis
-  F1 `yes`.
+- Classer les candidats avec lift top 10 %, PR-AUC validation, rappel `yes`,
+  puis F1 `yes`.
 - Fixer le seuil métier sur validation avec un budget de 10 % d'appels.
 
 #### Problèmes rencontrés
@@ -589,8 +589,8 @@ du test final.
 - **Raison :** le projet doit rester reproductible, explicable et aligné avec le
   cours. Une recherche exhaustive augmenterait le coût et le risque de choisir
   un modèle opportuniste.
-- **Conséquence :** le modèle final sera choisi avant toute évaluation du test
-  chronologique.
+- **Conséquence :** le modèle final sera choisi sur validation en priorisant le
+  lift top 10 %, avant toute évaluation du test chronologique.
 
 ---
 

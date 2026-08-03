@@ -307,6 +307,16 @@ def controlled_tuning_specs(
             "Arbre plus contraint pour reduire la variance.",
         ),
         (
+            "decision_tree_depth_6_leaf_50",
+            DecisionTreeClassifier(
+                max_depth=6,
+                min_samples_leaf=50,
+                class_weight="balanced",
+                random_state=random_state,
+            ),
+            "Arbre baseline du notebook 04, conserve comme point de comparaison.",
+        ),
+        (
             "decision_tree_depth_8_leaf_50",
             DecisionTreeClassifier(
                 max_depth=8,
@@ -327,6 +337,18 @@ def controlled_tuning_specs(
                 random_state=random_state,
             ),
             "Foret aleatoire regularisee, arbres peu profonds.",
+        ),
+        (
+            "random_forest_depth_12_leaf_25_n150",
+            RandomForestClassifier(
+                n_estimators=150,
+                max_depth=12,
+                min_samples_leaf=25,
+                class_weight="balanced_subsample",
+                n_jobs=-1,
+                random_state=random_state,
+            ),
+            "Foret aleatoire baseline du notebook 04, reprise pour comparaison.",
         ),
         (
             "random_forest_depth_12_leaf_25",
