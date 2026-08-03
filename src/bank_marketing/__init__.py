@@ -18,6 +18,7 @@ from .preprocessing import (
     SPLIT_COLUMN,
     prepare_silver_frame,
 )
+from .predict import prepare_prediction_features, score_customers
 
 __all__ = [
     "CATEGORICAL_FEATURES",
@@ -34,4 +35,6 @@ __all__ = [
     "SOURCE_ROW_COLUMN",
     "SPLIT_COLUMN",
     "prepare_silver_frame",
+    "prepare_prediction_features",
+    "score_customers",
 ]
