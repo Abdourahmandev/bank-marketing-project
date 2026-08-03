@@ -360,9 +360,20 @@ utiliser le jeu de test final.
   hors des métriques ;
 - les configurations comparent régression logistique, arbre de décision et forêt
   aléatoire avec quelques hyperparamètres raisonnables ;
-- les exécutions sont prévues dans l'expérience MLflow
-  `/Users/<utilisateur>/bank_marketing_tuning` ;
-- validation locale : `18 passed, 2 skipped`.
+- le Git Folder Databricks est synchronisé sur le commit
+  `47adc11a6fe8b379ce40bb5eeef004ecadceb4fa` ;
+- le notebook 05 a été exécuté avec succès dans Databricks, run Jobs
+  `625039448677736` ;
+- expérience MLflow :
+  `/Users/abdourahman03@gmail.com/bank_marketing_tuning`,
+  ID `3057066165070548` ;
+- candidat retenu sur validation :
+  `random_forest_depth_12_leaf_25_n150_unknown_category` ;
+- stratégie `unknown` retenue : conserver `unknown` comme catégorie explicite ;
+- seuil métier fixé sur validation : `0.525244` ;
+- métriques validation du candidat : PR-AUC `0.116787`, ROC-AUC `0.542584`,
+  rappel `yes` `0.205`, F1 `yes` `0.152`, lift top 10 % `0.899` ;
+- validation locale : `18 passed, 3 skipped`.
 
 #### Décisions prises et raisons
 
@@ -374,23 +385,26 @@ utiliser le jeu de test final.
 
 #### Problèmes rencontrés
 
-- Le notebook est prêt localement, mais son exécution Databricks dépend de la
-  synchronisation du Git Folder. Le workspace avait déjà signalé un conflit lié
-  aux fichiers importés manuellement avant le dernier push.
+- Le Git Folder Databricks contenait des copies locales importées manuellement.
+  La synchronisation a nécessité un discard forcé côté Git Folder pour revenir
+  à GitHub comme source de vérité.
+- La première exécution Jobs a échoué parce que MLflow cherchait à lire
+  `spark.mlflow.modelRegistryUri`, indisponible avec Spark Connect serverless.
+  Le notebook fixe maintenant explicitement `mlflow.set_tracking_uri("databricks")`
+  et `mlflow.set_registry_uri("databricks-uc")`.
+- Le lift top 10 % du meilleur candidat reste inférieur à 1. Ce résultat doit
+  être présenté comme une limite importante du protocole chronologique.
 
 #### Tâches restantes
 
-- synchroniser le Git Folder Databricks avec `main` ;
-- exécuter `05_tuning_mlflow.py` dans Databricks ;
-- consigner le modèle et le seuil retenus avec les métriques réelles de
-  validation ;
 - préparer `06_final_evaluation.py`.
+- décider avant le test si le modèle sera réentraîné sur train + validation ou
+  conservé tel qu'ajusté sur train.
 
 #### Prochaine action exacte
 
-Résoudre la synchronisation du Git Folder Databricks, exécuter
-`05_tuning_mlflow.py`, puis figer le modèle et le seuil avant toute consultation
-du test final.
+Créer `06_final_evaluation.py` pour reconstruire le candidat retenu, appliquer
+le seuil `0.525244` et évaluer une seule fois le jeu de test chronologique.
 
 ---
 
@@ -598,10 +612,11 @@ du test final.
 
 ### OUV-001 — Traitement de `unknown`
 
-- **État :** EN COURS
+- **État :** RÉSOLUE par validation dans le notebook 05
 - **Options :** conserver comme catégorie ; convertir en valeur manquante et imputer ; comparer les deux.
-- **Choix provisoire :** les deux traitements sont implémentés dans le notebook 05.
-- **Pourquoi le choix reste ouvert :** la décision finale dépend des métriques de validation exécutées dans Databricks.
+- **Décision :** conserver `unknown` comme catégorie explicite pour le candidat retenu.
+- **Preuve :** le meilleur candidat selon la règle de sélection est
+  `random_forest_depth_12_leaf_25_n150_unknown_category`.
 
 ### OUV-002 — Traitement des 12 doublons
 
@@ -613,9 +628,11 @@ du test final.
 
 ### OUV-003 — Seuil métier
 
-- **État :** EN COURS
+- **État :** RÉSOLUE par validation dans le notebook 05
 - **Options :** 0,5 ; maximiser F1 ; atteindre un rappel cible ; sélectionner les 10 % meilleurs scores.
-- **Choix provisoire :** sélectionner les 10 % meilleurs scores de validation et enregistrer le seuil correspondant.
+- **Décision :** utiliser le seuil `0.525244`, dérivé du budget de 10 % sur validation.
+- **Limite :** le lift top 10 % reste inférieur à 1, donc ce seuil doit être
+  validé prudemment sur le test final.
 
 ### OUV-004 — Réentraînement final
 
@@ -700,9 +717,9 @@ du test final.
 - `TERMINÉ` MLflow Databricks avec `mlflow.autolog()` explicite.
 - `TERMINÉ` Fonction commune d'évaluation.
 - `TERMINÉ` Tableau comparatif.
-- `EN COURS` Recherche d'hyperparamètres.
-- `EN COURS` Ajustement du seuil.
-- `À FAIRE` Sélection finale avant test.
+- `TERMINÉ` Recherche d'hyperparamètres.
+- `TERMINÉ` Ajustement du seuil.
+- `TERMINÉ` Sélection finale avant test.
 
 ### Évaluation et interprétation
 
@@ -809,6 +826,6 @@ Chaque nouvelle séance utilisera ce modèle :
 
 ## 10. Prochaine action exacte
 
-Synchroniser le Git Folder Databricks avec `main`, exécuter
-`05_tuning_mlflow.py`, puis consigner le modèle et le seuil retenus avant
-l'évaluation unique du test final dans `06_final_evaluation.py`.
+Créer `06_final_evaluation.py` pour reconstruire
+`random_forest_depth_12_leaf_25_n150_unknown_category`, appliquer le seuil
+`0.525244` et évaluer une seule fois le jeu de test chronologique.

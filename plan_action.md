@@ -468,11 +468,11 @@ Bronze est visible dans Unity Catalog.
 ### Phase 6 — Optimisation et sélection
 
 - [x] P6.1 Définir des espaces d'hyperparamètres raisonnables.
-- [ ] P6.2 Utiliser validation chronologique ou recherche contrôlée.
-- [ ] P6.3 Comparer poids de classes et seuils.
-- [ ] P6.4 Choisir le modèle selon performance, robustesse, coût et interprétabilité.
-- [ ] P6.5 Fixer le seuil sur la validation.
-- [ ] P6.6 Figer la configuration finale.
+- [x] P6.2 Utiliser validation chronologique ou recherche contrôlée.
+- [x] P6.3 Comparer poids de classes et seuils.
+- [x] P6.4 Choisir le modèle selon performance, robustesse, coût et interprétabilité.
+- [x] P6.5 Fixer le seuil sur la validation.
+- [x] P6.6 Figer la configuration finale.
 
 **Critère de sortie :** le modèle final est sélectionné selon une règle annoncée avant l'évaluation du test.
 

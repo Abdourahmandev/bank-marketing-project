@@ -39,10 +39,13 @@ logistiques, arbre de décision et forêt aléatoire. Les métriques sont suivie
 dans MLflow Databricks sous l'expérience
 `/Users/abdourahman03@gmail.com/bank_marketing_baselines`.
 
-Le notebook `05_tuning_mlflow.py` est prêt pour l'optimisation contrôlée :
-comparaison du traitement de `unknown`, hyperparamètres raisonnables, seuil
-métier fixé sur validation et journalisation MLflow sous une expérience dédiée.
-Le test final reste réservé au notebook `06_final_evaluation.py`.
+Le notebook `05_tuning_mlflow.py` a exécuté l'optimisation contrôlée dans
+Databricks sous l'expérience
+`/Users/abdourahman03@gmail.com/bank_marketing_tuning`. Le candidat retenu sur
+validation est `random_forest_depth_12_leaf_25_n150_unknown_category`, avec un
+seuil métier de `0.525244`. Le lift top 10 % reste inférieur à 1, donc le test
+final devra être interprété prudemment. Le test final reste réservé au notebook
+`06_final_evaluation.py`.
 
 ## Documentation de travail
 
