@@ -133,6 +133,8 @@ display(spark.createDataFrame(specs_pdf))
 # COMMAND ----------
 
 experiment_path = f"/Users/{spark.sql('SELECT current_user()').first()[0]}/bank_marketing_tuning"
+mlflow.set_tracking_uri("databricks")
+mlflow.set_registry_uri("databricks-uc")
 mlflow.set_experiment(experiment_path)
 
 try:
