@@ -24,6 +24,9 @@ VALIDATION_BUDGET_FRACTION = 0.10
 UNKNOWN_CATEGORY_STRATEGY = "keep_unknown"
 UNKNOWN_MISSING_STRATEGY = "unknown_as_missing"
 UNKNOWN_STRATEGIES = (UNKNOWN_CATEGORY_STRATEGY, UNKNOWN_MISSING_STRATEGY)
+SELECTED_TUNING_MODEL_NAME = "random_forest_depth_12_leaf_25_n150_unknown_category"
+FINAL_BUSINESS_THRESHOLD = 0.525244344106127
+FINAL_REFIT_STRATEGY = "train_only"
 
 
 @dataclass(frozen=True)
@@ -381,6 +384,28 @@ def controlled_tuning_specs(
                 )
             )
     return tuple(specs)
+
+
+def get_tuning_spec(
+    name: str,
+    *,
+    random_state: int = RANDOM_STATE,
+) -> TuningSpec:
+    """Retourne une configuration d'optimisation par son nom exact."""
+
+    for spec in controlled_tuning_specs(random_state=random_state):
+        if spec.name == name:
+            return spec
+    raise ValueError(f"Configuration de tuning inconnue: {name}")
+
+
+def selected_tuning_spec(random_state: int = RANDOM_STATE) -> TuningSpec:
+    """Retourne le candidat retenu avant evaluation finale."""
+
+    return get_tuning_spec(
+        SELECTED_TUNING_MODEL_NAME,
+        random_state=random_state,
+    )
 
 
 def build_model_pipeline(

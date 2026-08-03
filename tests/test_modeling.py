@@ -14,6 +14,9 @@ if str(SOURCE_ROOT) not in sys.path:
     sys.path.insert(0, str(SOURCE_ROOT))
 
 from bank_marketing.modeling import (  # noqa: E402
+    FINAL_BUSINESS_THRESHOLD,
+    FINAL_REFIT_STRATEGY,
+    SELECTED_TUNING_MODEL_NAME,
     UNKNOWN_CATEGORY_STRATEGY,
     UNKNOWN_MISSING_STRATEGY,
     build_model_pipeline,
@@ -21,6 +24,7 @@ from bank_marketing.modeling import (  # noqa: E402
     evaluate_binary_predictions,
     predictions_from_threshold,
     replace_unknown_with_missing,
+    selected_tuning_spec,
     split_silver_frame,
     threshold_for_top_budget,
 )
@@ -168,3 +172,14 @@ def test_build_model_pipeline_clones_estimator_instances() -> None:
     assert first_pipeline.named_steps["model"] is not spec.estimator
     assert second_pipeline.named_steps["model"] is not spec.estimator
     assert first_pipeline.named_steps["model"] is not second_pipeline.named_steps["model"]
+
+
+def test_selected_tuning_spec_matches_frozen_final_candidate() -> None:
+    pytest.importorskip("sklearn")
+
+    spec = selected_tuning_spec()
+
+    assert spec.name == SELECTED_TUNING_MODEL_NAME
+    assert spec.unknown_strategy == UNKNOWN_CATEGORY_STRATEGY
+    assert FINAL_BUSINESS_THRESHOLD == pytest.approx(0.525244344106127)
+    assert FINAL_REFIT_STRATEGY == "train_only"
