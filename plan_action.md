@@ -478,14 +478,14 @@ Bronze est visible dans Unity Catalog.
 
 ### Phase 7 — Évaluation finale
 
-- [ ] P7.1 Réentraîner sur entraînement + validation si approprié.
-- [ ] P7.2 Évaluer une seule fois sur le test chronologique.
-- [ ] P7.3 Produire matrice de confusion brute et normalisée.
-- [ ] P7.4 Produire rapport de classification.
-- [ ] P7.5 Produire courbes ROC et précision-rappel.
-- [ ] P7.6 Calculer métriques métier et lift.
-- [ ] P7.7 Comparer entraînement, validation et test.
-- [ ] P7.8 Documenter les résultats sans les exagérer.
+- [x] P7.1 Réentraîner sur entraînement + validation si approprié.
+- [x] P7.2 Évaluer une seule fois sur le test chronologique.
+- [x] P7.3 Produire matrice de confusion brute et normalisée.
+- [x] P7.4 Produire rapport de classification.
+- [x] P7.5 Produire courbes ROC et précision-rappel.
+- [x] P7.6 Calculer métriques métier et lift.
+- [x] P7.7 Comparer entraînement, validation et test.
+- [x] P7.8 Documenter les résultats sans les exagérer.
 
 **Critère de sortie :** la performance annoncée correspond à des données futures non utilisées pendant le développement.
 

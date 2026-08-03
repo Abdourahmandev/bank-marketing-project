@@ -44,8 +44,13 @@ Databricks sous l'expérience
 `/Users/abdourahman03@gmail.com/bank_marketing_tuning`. Le candidat retenu sur
 validation est `random_forest_depth_12_leaf_25_n150_unknown_category`, avec un
 seuil métier de `0.525244`. Le lift top 10 % reste inférieur à 1, donc le test
-final devra être interprété prudemment. Le test final reste réservé au notebook
-`06_final_evaluation.py`.
+final devait être interprété prudemment dans `06_final_evaluation.py`.
+
+Le notebook `06_final_evaluation.py` a évalué une seule fois le test
+chronologique sous l'expérience
+`/Users/abdourahman03@gmail.com/bank_marketing_final_evaluation`. Résultat test :
+PR-AUC `0.3491`, ROC-AUC `0.5578`, rappel `yes` `0.1276`, précision `yes`
+`0.4040`, F1 `yes` `0.1940` et lift top 10 % `1.3148`.
 
 ## Documentation de travail
 

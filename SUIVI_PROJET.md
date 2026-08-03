@@ -22,7 +22,7 @@ Il doit être mis à jour après chaque séance de travail importante. Le plan c
 
 ---
 
-## 2. État global au 31 juillet 2026
+## 2. État global au 3 août 2026
 
 | Élément | État | Commentaire |
 |---|---|---|
@@ -43,17 +43,17 @@ Il doit être mis à jour après chaque séance de travail importante. Le plan c
 | ingestion Bronze | TERMINÉ | CSV téléversé et notebook exécuté par l'étudiant |
 | environnement Python | EN COURS | compute serverless retenu ; scikit-learn et MLflow validés, versions à documenter |
 | acquisition avec DVC | À FAIRE | fichier officiel pas encore ajouté au dépôt de projet |
-| EDA | EN COURS | notebook initial exécuté ; analyses avancées et export des figures restent à faire |
+| EDA | EN COURS | notebook initial exécuté ; export des figures finales reste à faire |
 | prétraitement | TERMINÉ | table Silver créée et contrôles validés dans Databricks |
-| modélisation | EN COURS | notebook 04 exécuté ; premières baselines comparées sur validation |
-| MLflow | EN COURS | expérience Databricks créée et 5 runs de baselines enregistrés |
-| évaluation finale | À FAIRE | aucun résultat ne doit être annoncé avant exécution |
+| modélisation | TERMINÉ | baselines, tuning et sélection finale exécutés |
+| MLflow | TERMINÉ | expériences baselines, tuning et évaluation finale enregistrées |
+| évaluation finale | TERMINÉ | notebook 06 exécuté une seule fois sur test chronologique |
 | présentation | À FAIRE | plan temporel défini, PowerPoint non créé |
 
-Estimation prudente de l'avancement total : **environ 45 %**. L'architecture,
-l'ingestion, l'EDA initiale, Silver et les premières baselines fonctionnent. La
-prochaine étape est d'améliorer les modèles et le seuil sur validation sans
-consulter le test final.
+Estimation prudente de l'avancement total : **environ 65 %**. L'architecture,
+l'ingestion, l'EDA initiale, Silver, les baselines, le tuning et l'évaluation
+finale fonctionnent. La prochaine étape est d'expliquer les erreurs, les
+variables importantes, les sous-groupes et les limites métier.
 
 ---
 
@@ -406,6 +406,70 @@ utiliser le jeu de test final.
 Créer `06_final_evaluation.py` pour reconstruire le candidat retenu, appliquer
 le seuil `0.525244` et évaluer une seule fois le jeu de test chronologique.
 
+### Séance du 3 août 2026 — Évaluation finale sur test
+
+#### Objectif
+
+Évaluer une seule fois le modèle final figé sur le split chronologique `test`,
+sans modifier le modèle après consultation des résultats.
+
+#### Actions effectuées
+
+- ajout des constantes finales dans `src/bank_marketing/modeling.py` ;
+- ajout du notebook Databricks `06_final_evaluation.py` ;
+- ajout de tests unitaires pour vérifier le candidat final, le seuil et la
+  stratégie de réentraînement ;
+- exécution locale des tests automatisés ;
+- synchronisation du Git Folder Databricks sur `main` ;
+- exécution du notebook 06 dans Databricks Jobs serverless.
+
+#### Résultats et preuves
+
+- commit exécuté dans Databricks : `46fa45ea77db2f55abc992fb31118430549f2c0c` ;
+- run Jobs Databricks : `38771101216806` ;
+- expérience MLflow :
+  `/Users/abdourahman03@gmail.com/bank_marketing_final_evaluation`,
+  ID `1171963300815498` ;
+- run MLflow final : `0de8816ed1864ce982ee7f911b500b9b` ;
+- modèle évalué :
+  `random_forest_depth_12_leaf_25_n150_unknown_category` ;
+- stratégie de réentraînement : `train_only` ;
+- seuil appliqué : `0.525244344106127` ;
+- taille du test : 8 236 lignes, dont 2 539 positives ;
+- matrice de confusion test : TN `5219`, FP `478`, FN `2215`, TP `324` ;
+- métriques test : accuracy `0.6730`, balanced accuracy `0.5219`,
+  PR-AUC `0.3491`, ROC-AUC `0.5578`, précision `yes` `0.4040`,
+  rappel `yes` `0.1276`, F1 `yes` `0.1940` ;
+- métriques métier test : top 10 % = 824 clients, précision `0.4053`,
+  rappel `0.1315`, lift `1.3148` ;
+- validation locale : `18 passed, 4 skipped`.
+
+#### Décisions prises et raisons
+
+- Ne pas réentraîner sur train + validation avant le test. Le seuil
+  `0.525244344106127` a été calibré sur le modèle entraîné uniquement sur
+  `train`. Conserver ce modèle évite de changer la distribution des scores juste
+  avant le test.
+- Présenter le résultat sans exagération : le lift top 10 % est supérieur à 1
+  sur test, mais le rappel reste faible. Le modèle trouve une partie des clients
+  intéressants, pas une solution complète de ciblage.
+
+#### Problèmes rencontrés
+
+- Aucun blocage d'exécution. Le notebook 06 a réussi en Jobs serverless.
+
+#### Tâches restantes
+
+- analyser les faux positifs et faux négatifs ;
+- interpréter les variables importantes du modèle ;
+- examiner les performances par sous-groupes ;
+- formuler les limites pour la présentation.
+
+#### Prochaine action exacte
+
+Ajouter une analyse d'erreurs et d'interprétation : faux positifs, faux
+négatifs, importance des variables et limites métier.
+
 ---
 
 ## 4. Registre des décisions
@@ -606,6 +670,18 @@ le seuil `0.525244` et évaluer une seule fois le jeu de test chronologique.
 - **Conséquence :** le modèle final sera choisi sur validation en priorisant le
   lift top 10 %, avant toute évaluation du test chronologique.
 
+### DEC-026 — Conserver le modèle entraîné sur train pour le test
+
+- **Date :** 3 août 2026
+- **État :** ACCEPTÉE
+- **Décision :** ne pas réentraîner le candidat final sur train + validation
+  avant l'évaluation du test.
+- **Raison :** le seuil métier a été fixé sur les scores de validation du modèle
+  entraîné uniquement sur `train`. Réentraîner le modèle juste avant le test
+  aurait changé la distribution des scores sans recalibrer le seuil.
+- **Conséquence :** l'évaluation test mesure exactement le candidat figé à la
+  fin du notebook 05.
+
 ---
 
 ## 5. Décisions encore ouvertes
@@ -636,9 +712,10 @@ le seuil `0.525244` et évaluer une seule fois le jeu de test chronologique.
 
 ### OUV-004 — Réentraînement final
 
-- **État :** À FAIRE
-- **Question :** après sélection, réentraîner sur train + validation ou conserver le modèle ajusté uniquement sur train ?
-- **Condition :** décider avant de consulter les métriques du test final.
+- **État :** RÉSOLUE par DEC-026
+- **Décision :** conserver le modèle ajusté uniquement sur train pour
+  l'évaluation finale.
+- **Preuve :** notebook 06 exécuté avec `FINAL_REFIT_STRATEGY="train_only"`.
 
 ### OUV-005 — DVC remote
 
@@ -723,11 +800,11 @@ le seuil `0.525244` et évaluer une seule fois le jeu de test chronologique.
 
 ### Évaluation et interprétation
 
-- `À FAIRE` Matrices de confusion.
-- `À FAIRE` Rapport de classification.
-- `À FAIRE` ROC-AUC et courbe ROC.
-- `À FAIRE` PR-AUC et courbe précision-rappel.
-- `À FAIRE` Lift et métriques top 10 %.
+- `TERMINÉ` Matrices de confusion.
+- `TERMINÉ` Rapport de classification.
+- `TERMINÉ` ROC-AUC et courbe ROC.
+- `TERMINÉ` PR-AUC et courbe précision-rappel.
+- `TERMINÉ` Lift et métriques top 10 %.
 - `À FAIRE` Analyse des erreurs.
 - `À FAIRE` Importances et coefficients.
 - `À FAIRE` Analyse des sous-groupes.
@@ -826,6 +903,5 @@ Chaque nouvelle séance utilisera ce modèle :
 
 ## 10. Prochaine action exacte
 
-Créer `06_final_evaluation.py` pour reconstruire
-`random_forest_depth_12_leaf_25_n150_unknown_category`, appliquer le seuil
-`0.525244` et évaluer une seule fois le jeu de test chronologique.
+Ajouter l'analyse d'erreurs et d'interprétation : faux positifs, faux négatifs,
+importance des variables, sous-groupes et limites métier.
