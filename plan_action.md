@@ -510,7 +510,7 @@ Bronze est visible dans Unity Catalog.
 - [x] P9.4 Ajouter des tests unitaires et un test de bout en bout.
 - [x] P9.5 Ajouter `params.yaml` et les commandes DVC nécessaires.
 - [x] P9.6 Ajouter la GitHub Action minimale.
-- [ ] P9.7 Vérifier l'installation depuis un environnement propre.
+- [x] P9.7 Vérifier l'installation depuis un environnement propre.
 - [ ] P9.8 Compléter le README.
 - [x] P9.9 Préparer une démonstration stable.
 

@@ -52,12 +52,13 @@ Il doit être mis à jour après chaque séance de travail importante. Le plan c
 | inférence et démonstration | TERMINÉ | pipeline joblib, `predict.py`, notebook 08 et table de prédictions créés |
 | présentation | À FAIRE | plan temporel défini, PowerPoint non créé |
 
-Estimation prudente de l'avancement total : **environ 86 %**. L'architecture,
+Estimation prudente de l'avancement total : **environ 88 %**. L'architecture,
 l'ingestion, l'EDA initiale, Silver, les baselines, le tuning et l'évaluation
 finale fonctionnent. L'interprétation, la sérialisation joblib et la
 démonstration de prédiction sont disponibles. DVC, `params.yaml`, les
-dépendances et la CI minimale sont en place. La prochaine étape est de vérifier
-l'environnement propre puis finaliser le README et la présentation.
+dépendances et la CI minimale sont en place. La GitHub Action a validé une
+installation propre. La prochaine étape est de finaliser le README et préparer
+la présentation.
 
 ---
 
@@ -639,7 +640,9 @@ CSV officiel, dépendances installables et validation automatisée.
 - `python -m dvc status` : données et pipelines à jour ;
 - `python -m pip check` : aucune dépendance cassée ;
 - validation locale après installation des dépendances complètes :
-  `31 passed`.
+  `31 passed` ;
+- GitHub Actions : workflow `CI`, run `30865277261`, job `91855643020`,
+  terminé avec succès en `59s`.
 
 #### Décisions prises et raisons
 
@@ -659,14 +662,12 @@ CSV officiel, dépendances installables et validation automatisée.
 
 #### Tâches restantes
 
-- vérifier la GitHub Action après le push ;
 - compléter le README final ;
 - préparer la présentation PowerPoint et la démonstration orale.
 
 #### Prochaine action exacte
 
-Vérifier l'exécution GitHub Actions, puis compléter le README final avant de
-préparer le PowerPoint.
+Compléter le README final, puis préparer le PowerPoint.
 
 ---
 
@@ -1118,5 +1119,4 @@ Chaque nouvelle séance utilisera ce modèle :
 
 ## 10. Prochaine action exacte
 
-Vérifier l'exécution GitHub Actions, puis compléter le README final avant de
-préparer le PowerPoint.
+Compléter le README final, puis préparer le PowerPoint.
