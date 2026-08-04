@@ -41,8 +41,8 @@ Il doit être mis à jour après chaque séance de travail importante. Le plan c
 | manifeste du dataset | TERMINÉ | taille, SHA-256, schéma et comptes de référence ajoutés |
 | CSV brut local | TERMINÉ | copie officielle vérifiée dans `data/raw/`, ignorée par Git |
 | ingestion Bronze | TERMINÉ | CSV téléversé et notebook exécuté par l'étudiant |
-| environnement Python | EN COURS | compute serverless retenu ; scikit-learn et MLflow validés, versions à documenter |
-| acquisition avec DVC | À FAIRE | fichier officiel pas encore ajouté au dépôt de projet |
+| environnement Python | TERMINÉ | dépendances documentées dans `requirements.txt` et CI minimale ajoutée |
+| acquisition avec DVC | TERMINÉ | CSV officiel suivi par DVC ; remote durable encore à choisir |
 | EDA | EN COURS | notebook initial exécuté ; export des figures finales reste à faire |
 | prétraitement | TERMINÉ | table Silver créée et contrôles validés dans Databricks |
 | modélisation | TERMINÉ | baselines, tuning et sélection finale exécutés |
@@ -52,11 +52,12 @@ Il doit être mis à jour après chaque séance de travail importante. Le plan c
 | inférence et démonstration | TERMINÉ | pipeline joblib, `predict.py`, notebook 08 et table de prédictions créés |
 | présentation | À FAIRE | plan temporel défini, PowerPoint non créé |
 
-Estimation prudente de l'avancement total : **environ 82 %**. L'architecture,
+Estimation prudente de l'avancement total : **environ 86 %**. L'architecture,
 l'ingestion, l'EDA initiale, Silver, les baselines, le tuning et l'évaluation
 finale fonctionnent. L'interprétation, la sérialisation joblib et la
-démonstration de prédiction sont disponibles. La prochaine étape est de terminer
-la reproductibilité formelle : DVC, CI minimale, dépendances et README final.
+démonstration de prédiction sont disponibles. DVC, `params.yaml`, les
+dépendances et la CI minimale sont en place. La prochaine étape est de vérifier
+l'environnement propre puis finaliser le README et la présentation.
 
 ---
 
@@ -607,6 +608,66 @@ une démonstration stable de scoring dans Databricks.
 Ajouter `params.yaml`, formaliser les commandes DVC et créer la GitHub Action
 minimale.
 
+### Séance du 3 août 2026 — DVC, paramètres et CI minimale
+
+#### Objectif
+
+Formaliser la reproductibilité locale : paramètres centralisés, suivi DVC du
+CSV officiel, dépendances installables et validation automatisée.
+
+#### Actions effectuées
+
+- téléchargement de l'archive officielle UCI et extraction du CSV imbriqué ;
+- vérification de `data/raw/bank-additional-full.csv` par taille et SHA-256 ;
+- installation de DVC `3.67.1` et initialisation du dépôt DVC ;
+- ajout de `data/raw/bank-additional-full.csv.dvc` ;
+- désactivation de l'analytics DVC dans la configuration du dépôt ;
+- création de `params.yaml` avec dataset, splits, modèle final, seuil et
+  artefacts ;
+- création de `requirements.txt` ;
+- création de `.github/workflows/ci.yml` ;
+- ajout de tests pour vérifier que `params.yaml` reste cohérent avec le
+  manifeste et les constantes du code.
+
+#### Résultats et preuves
+
+- SHA-256 vérifié :
+  `74adfc578bf77a7ff4bb1ba4a9f8709d9e3c6907342959c2c8416847e0afb4d8` ;
+- taille vérifiée : `5834924` octets ;
+- fichier DVC : `data/raw/bank-additional-full.csv.dvc` ;
+- MD5 DVC : `f6cb2c1256ffe2836b36df321f46e92c` ;
+- `python -m dvc status` : données et pipelines à jour ;
+- `python -m pip check` : aucune dépendance cassée ;
+- validation locale après installation des dépendances complètes :
+  `31 passed`.
+
+#### Décisions prises et raisons
+
+- Ne pas ajouter le CSV dans Git. Git conserve seulement le pointeur DVC, le
+  manifeste et les paramètres.
+- Ne pas configurer de remote DVC public sans décision explicite sur le lieu de
+  stockage. Le suivi local est prêt ; le remote reste un choix séparé.
+- Utiliser une GitHub Action simple : dépendances, tests et compilation
+  syntaxique. Les exécutions Databricks restent validées dans le workspace.
+
+#### Problèmes rencontrés
+
+- L'archive UCI contient un fichier `bank-additional.zip` imbriqué ; il a fallu
+  extraire cette archive interne pour obtenir `bank-additional-full.csv`.
+- YAML interprète `yes` comme booléen si la valeur n'est pas entre guillemets.
+  `params.yaml` utilise donc `"yes"` pour la classe positive.
+
+#### Tâches restantes
+
+- vérifier la GitHub Action après le push ;
+- compléter le README final ;
+- préparer la présentation PowerPoint et la démonstration orale.
+
+#### Prochaine action exacte
+
+Vérifier l'exécution GitHub Actions, puis compléter le README final avant de
+préparer le PowerPoint.
+
 ---
 
 ## 4. Registre des décisions
@@ -871,6 +932,8 @@ minimale.
 - **État :** À FAIRE
 - **Options :** stockage local, Google Drive ou autre espace distant.
 - **Contrainte :** ne pas ajouter un remote contenant des secrets dans Git.
+- **Avancement :** DVC est initialisé et le CSV officiel est suivi localement ;
+  seul le remote durable reste ouvert.
 
 ### OUV-006 — Interface de démonstration
 
@@ -895,8 +958,8 @@ minimale.
 6. `TERMINÉ` Exécuter et valider `01_ingestion_bronze.py`.
 7. `TERMINÉ` Exécuter `02_eda.py` et conserver les premières observations.
 8. `TERMINÉ` Préparer et exécuter `03_preprocessing_silver.py`.
-9. `À FAIRE` Initialiser DVC côté local pour la provenance du fichier.
-10. `EN COURS` Valider les bibliothèques disponibles dans le compute serverless.
+9. `TERMINÉ` Initialiser DVC côté local pour la provenance du fichier.
+10. `TERMINÉ` Valider les bibliothèques disponibles dans le compute serverless.
 
 ### Acquisition et validation du schéma
 
@@ -967,8 +1030,8 @@ minimale.
 - `TERMINÉ` Sauvegarde de la pipeline.
 - `TERMINÉ` Script de prédiction.
 - `TERMINÉ` Tests automatisés.
-- `À FAIRE` GitHub Action.
-- `À FAIRE` README final.
+- `TERMINÉ` GitHub Action.
+- `EN COURS` README final.
 - `À FAIRE` PowerPoint.
 - `TERMINÉ` Démonstration.
 - `À FAIRE` Répétition de 15 minutes.
@@ -1055,5 +1118,5 @@ Chaque nouvelle séance utilisera ce modèle :
 
 ## 10. Prochaine action exacte
 
-Ajouter `params.yaml`, formaliser les commandes DVC et créer la GitHub Action
-minimale.
+Vérifier l'exécution GitHub Actions, puis compléter le README final avant de
+préparer le PowerPoint.

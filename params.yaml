@@ -1,0 +1,34 @@
+dataset:
+  manifest_path: data/dataset_manifest.json
+  raw_path: data/raw/bank-additional-full.csv
+  expected_sha256: 74adfc578bf77a7ff4bb1ba4a9f8709d9e3c6907342959c2c8416847e0afb4d8
+  expected_file_size_bytes: 5834924
+  expected_raw_rows: 41188
+  expected_raw_columns: 21
+  expected_silver_rows: 41176
+  target_column: y
+  positive_class: "yes"
+  leakage_columns:
+    - duration
+
+splits:
+  strategy: chronological_source_order
+  train_fraction: 0.60
+  validation_fraction: 0.20
+  test_fraction: 0.20
+
+model:
+  random_state: 42
+  selected_model: random_forest_depth_12_leaf_25_n150_unknown_category
+  unknown_strategy: keep_unknown
+  final_refit_strategy: train_only
+  final_business_threshold: 0.525244344106127
+
+business:
+  top_budget_fraction: 0.10
+
+artifacts:
+  local_model_path: models/bank_marketing_final_pipeline.joblib
+  databricks_model_path: /Volumes/workspace/default/bank_marketing/models/bank_marketing_final_pipeline.joblib
+  databricks_prediction_schema_path: /Volumes/workspace/default/bank_marketing/models/prediction_schema.json
+  databricks_predictions_table: workspace.default.bank_marketing_predictions

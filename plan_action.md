@@ -388,8 +388,8 @@ Limites attendues : coût de prédiction sur 41 188 lignes, sensibilité à l'é
 - [x] P0.7 Créer l'arborescence initiale.
 - [x] P0.8 Connecter GitHub à Databricks avec un Git Folder.
 - [x] P0.9 Ajouter le manifeste et la configuration Databricks initiale.
-- [ ] P0.10 Configurer DVC.
-- [ ] P0.11 Valider les bibliothèques du compute serverless et documenter les dépendances additionnelles.
+- [x] P0.10 Configurer DVC.
+- [x] P0.11 Valider les bibliothèques du compute serverless et documenter les dépendances additionnelles.
 - [x] P0.12 Valider MLflow géré avec `mlflow.autolog()`.
 
 **Critère de sortie :** projet clonable, structure compréhensible, environnement reproductible et plan approuvé.
@@ -399,7 +399,7 @@ Limites attendues : coût de prédiction sur 41 188 lignes, sensibilité à l'é
 - [x] P1.1 Télécharger l'archive officielle hors Databricks.
 - [x] P1.2 Vérifier le fichier, sa taille et son empreinte SHA-256.
 - [x] P1.3 Conserver le CSV brut sans modification dans `data/raw/`.
-- [ ] P1.4 Ajouter le CSV à DVC.
+- [x] P1.4 Ajouter le CSV à DVC.
 - [x] P1.5 Documenter la source, licence, citation et empreinte dans un manifeste.
 - [x] P1.6 Téléverser le CSV dans un Unity Catalog Volume.
 - [x] P1.7 Écrire un contrat validant les colonnes, les lignes et la cible.
@@ -508,8 +508,8 @@ Bronze est visible dans Unity Catalog.
 - [x] P9.2 Écrire `predict.py`.
 - [x] P9.3 Valider les entrées de prédiction.
 - [x] P9.4 Ajouter des tests unitaires et un test de bout en bout.
-- [ ] P9.5 Ajouter `params.yaml` et les commandes DVC nécessaires.
-- [ ] P9.6 Ajouter la GitHub Action minimale.
+- [x] P9.5 Ajouter `params.yaml` et les commandes DVC nécessaires.
+- [x] P9.6 Ajouter la GitHub Action minimale.
 - [ ] P9.7 Vérifier l'installation depuis un environnement propre.
 - [ ] P9.8 Compléter le README.
 - [x] P9.9 Préparer une démonstration stable.

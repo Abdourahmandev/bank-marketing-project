@@ -75,3 +75,32 @@ Delta `workspace.default.bank_marketing_predictions`. La démonstration produit
 - [Configuration Databricks](docs/databricks_setup.md)
 
 Les notebooks Databricks se trouvent dans [`notebooks/databricks/`](notebooks/databricks/).
+
+## Reproduction locale
+
+Installation minimale :
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+Contrôles locaux :
+
+```powershell
+python -m pytest -q
+python -m dvc status
+```
+
+Le fichier brut est suivi par DVC avec
+`data/raw/bank-additional-full.csv.dvc`. Le CSV lui-même reste ignoré par Git.
+Le remote DVC durable reste à choisir ; sur une nouvelle machine, utiliser le
+manifeste `data/dataset_manifest.json` pour télécharger l'archive UCI officielle,
+extraire `bank-additional-full.csv` dans `data/raw/`, puis vérifier le SHA-256
+indiqué dans `params.yaml`.
+
+GitHub Actions exécute une validation minimale à chaque push et pull request :
+installation des dépendances, tests `pytest` et compilation syntaxique des
+fichiers Python suivis par Git.
