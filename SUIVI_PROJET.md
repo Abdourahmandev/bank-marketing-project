@@ -22,7 +22,7 @@ Il doit être mis à jour après chaque séance de travail importante. Le plan c
 
 ---
 
-## 2. État global au 3 août 2026
+## 2. État global au 4 août 2026
 
 | Élément | État | Commentaire |
 |---|---|---|
@@ -50,15 +50,15 @@ Il doit être mis à jour après chaque séance de travail importante. Le plan c
 | évaluation finale | TERMINÉ | notebook 06 exécuté une seule fois sur test chronologique |
 | interprétation | TERMINÉ | erreurs, importances, sous-groupes et limites analysés |
 | inférence et démonstration | TERMINÉ | pipeline joblib, `predict.py`, notebook 08 et table de prédictions créés |
-| présentation | À FAIRE | plan temporel défini, PowerPoint non créé |
+| présentation | À FAIRE | modèle PowerPoint fourni, deck non créé |
 
-Estimation prudente de l'avancement total : **environ 88 %**. L'architecture,
+Estimation prudente de l'avancement total : **environ 90 %**. L'architecture,
 l'ingestion, l'EDA initiale, Silver, les baselines, le tuning et l'évaluation
 finale fonctionnent. L'interprétation, la sérialisation joblib et la
 démonstration de prédiction sont disponibles. DVC, `params.yaml`, les
 dépendances et la CI minimale sont en place. La GitHub Action a validé une
-installation propre. La prochaine étape est de finaliser le README et préparer
-la présentation.
+installation propre. Le README final est disponible. La prochaine étape est de
+préparer la présentation PowerPoint.
 
 ---
 
@@ -669,6 +669,52 @@ CSV officiel, dépendances installables et validation automatisée.
 
 Compléter le README final, puis préparer le PowerPoint.
 
+### Séance du 4 août 2026 — README final et modèle PowerPoint
+
+#### Objectif
+
+Transformer le README en document principal de remise et consigner le modèle
+PowerPoint à utiliser pour la présentation.
+
+#### Actions effectuées
+
+- réécriture complète du README ;
+- ajout d'un résumé des résultats finaux ;
+- ajout des sources, citation, licence et SHA-256 du dataset ;
+- ajout de l'architecture, de la méthodologie, des notebooks, des expériences
+  MLflow, de DVC, de la reproduction locale et des limites ;
+- vérification de l'existence du modèle PowerPoint fourni par l'étudiant ;
+- mise à jour du plan pour marquer le README comme terminé.
+
+#### Résultats et preuves
+
+- README final : `README.md` ;
+- modèle PowerPoint confirmé :
+  `C:\Users\User\Documents\BdeB Mathmatique\Pogrammation de pipeline de donnee\presentation_sp500_clair_data_pro.pptx`.
+
+#### Décisions prises et raisons
+
+- Garder le README en français, cohérent avec le cours et le reste de la
+  documentation.
+- Présenter les résultats sans exagération : le lift top 10 % est utile, mais
+  le rappel de la classe positive reste faible.
+- Utiliser le PowerPoint fourni comme base visuelle pour préserver un style déjà
+  accepté dans un autre projet.
+
+#### Problèmes rencontrés
+
+- Aucun blocage. Le fichier PowerPoint existe au chemin indiqué.
+
+#### Tâches restantes
+
+- construire le PowerPoint à partir du modèle fourni ;
+- préparer une démonstration orale de moins de deux minutes ;
+- répéter la présentation de 15 minutes.
+
+#### Prochaine action exacte
+
+Créer le PowerPoint final à partir du modèle fourni.
+
 ---
 
 ## 4. Registre des décisions
@@ -1032,7 +1078,7 @@ Compléter le README final, puis préparer le PowerPoint.
 - `TERMINÉ` Script de prédiction.
 - `TERMINÉ` Tests automatisés.
 - `TERMINÉ` GitHub Action.
-- `EN COURS` README final.
+- `TERMINÉ` README final.
 - `À FAIRE` PowerPoint.
 - `TERMINÉ` Démonstration.
 - `À FAIRE` Répétition de 15 minutes.
@@ -1119,4 +1165,4 @@ Chaque nouvelle séance utilisera ce modèle :
 
 ## 10. Prochaine action exacte
 
-Compléter le README final, puis préparer le PowerPoint.
+Créer le PowerPoint final à partir du modèle fourni.

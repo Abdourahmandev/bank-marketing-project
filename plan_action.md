@@ -511,14 +511,14 @@ Bronze est visible dans Unity Catalog.
 - [x] P9.5 Ajouter `params.yaml` et les commandes DVC nécessaires.
 - [x] P9.6 Ajouter la GitHub Action minimale.
 - [x] P9.7 Vérifier l'installation depuis un environnement propre.
-- [ ] P9.8 Compléter le README.
+- [x] P9.8 Compléter le README.
 - [x] P9.9 Préparer une démonstration stable.
 
 **Critère de sortie :** une personne peut reproduire l'entraînement et exécuter une prédiction en suivant le README.
 
 ### Phase 10 — Présentation et remise
 
-- [ ] P10.1 Construire le PowerPoint.
+- [ ] P10.1 Construire le PowerPoint avec le modèle fourni.
 - [ ] P10.2 Sélectionner uniquement les graphiques utiles.
 - [ ] P10.3 Préparer une démonstration de moins de deux minutes.
 - [ ] P10.4 Préparer les réponses aux questions probables.
