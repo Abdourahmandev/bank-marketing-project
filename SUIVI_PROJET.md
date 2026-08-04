@@ -50,15 +50,15 @@ Il doit être mis à jour après chaque séance de travail importante. Le plan c
 | évaluation finale | TERMINÉ | notebook 06 exécuté une seule fois sur test chronologique |
 | interprétation | TERMINÉ | erreurs, importances, sous-groupes et limites analysés |
 | inférence et démonstration | TERMINÉ | pipeline joblib, `predict.py`, notebook 08 et table de prédictions créés |
-| présentation | À FAIRE | modèle PowerPoint fourni, deck non créé |
+| présentation | TERMINÉ | PowerPoint final créé dans `presentation/` avec notes sources |
 
-Estimation prudente de l'avancement total : **environ 90 %**. L'architecture,
+Estimation prudente de l'avancement total : **environ 97 %**. L'architecture,
 l'ingestion, l'EDA initiale, Silver, les baselines, le tuning et l'évaluation
 finale fonctionnent. L'interprétation, la sérialisation joblib et la
 démonstration de prédiction sont disponibles. DVC, `params.yaml`, les
 dépendances et la CI minimale sont en place. La GitHub Action a validé une
-installation propre. Le README final est disponible. La prochaine étape est de
-préparer la présentation PowerPoint.
+installation propre. Le README final et le PowerPoint sont disponibles. La
+prochaine étape est de répéter la présentation et la démonstration orale.
 
 ---
 
@@ -715,6 +715,60 @@ PowerPoint à utiliser pour la présentation.
 
 Créer le PowerPoint final à partir du modèle fourni.
 
+### Séance du 4 août 2026 — PowerPoint final
+
+#### Objectif
+
+Créer le PowerPoint final à partir du modèle fourni par l'étudiant et aligner
+les diapositives avec les résultats réels du projet.
+
+#### Actions effectuées
+
+- inspection du modèle PowerPoint fourni ;
+- création d'un deck final de 12 diapositives dans le style du modèle ;
+- ajout des résultats, limites, architecture, stack, MLflow, CI/CD et
+  démonstration ;
+- ajout de notes conférencier avec blocs `[Sources]` ;
+- rendu de toutes les diapositives en PNG pour inspection visuelle ;
+- correction des titres hérités trop étroits et de deux artefacts graphiques
+  hérités ;
+- exécution des contrôles de débordement et de fidélité au modèle.
+
+#### Résultats et preuves
+
+- PowerPoint final :
+  `presentation/bank_marketing_project_presentation.pptx` ;
+- nombre de diapositives : 12 ;
+- contrôle de débordement : réussi, aucun débordement détecté ;
+- contrôle de fidélité au modèle : réussi, 0 problème ;
+- recherche de texte hérité du modèle S&P 500 : aucun reste détecté.
+
+#### Décisions prises et raisons
+
+- Conserver le style clair du PowerPoint fourni pour rester cohérent avec un
+  format déjà accepté dans un autre projet.
+- Présenter le modèle comme un outil de priorisation imparfait : lift supérieur
+  à 1 sur le test, mais rappel `yes` faible.
+- Garder les preuves sous forme de panneaux éditables plutôt que captures
+  externes, afin que la présentation reste modifiable.
+
+#### Problèmes rencontrés
+
+- Les boîtes de titre de certaines diapositives héritées étaient trop étroites ;
+  elles ont été élargies avant le rendu final.
+- Deux rectangles vides hérités du modèle apparaissaient sur la diapositive
+  CI/CD ; ils ont été retirés.
+
+#### Tâches restantes
+
+- répéter la présentation de 15 minutes ;
+- préparer une démonstration Databricks courte ;
+- vérifier les consignes exactes de remise.
+
+#### Prochaine action exacte
+
+Répéter l'oral avec le PowerPoint final et la démonstration Databricks.
+
 ---
 
 ## 4. Registre des décisions
@@ -1079,10 +1133,10 @@ Créer le PowerPoint final à partir du modèle fourni.
 - `TERMINÉ` Tests automatisés.
 - `TERMINÉ` GitHub Action.
 - `TERMINÉ` README final.
-- `À FAIRE` PowerPoint.
+- `TERMINÉ` PowerPoint.
 - `TERMINÉ` Démonstration.
 - `À FAIRE` Répétition de 15 minutes.
-- `À FAIRE` Vérification finale des citations.
+- `TERMINÉ` Vérification finale des citations.
 
 ---
 
@@ -1165,4 +1219,5 @@ Chaque nouvelle séance utilisera ce modèle :
 
 ## 10. Prochaine action exacte
 
-Créer le PowerPoint final à partir du modèle fourni.
+Répéter la présentation de 15 minutes et préparer une démonstration Databricks
+courte.

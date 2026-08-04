@@ -39,6 +39,10 @@ mlflow.db
 # Rapports générés volumineux
 reports/*.html
 
+# Fichiers temporaires de génération locale
+.tmp/
+*.pptx.inspect.ndjson
+
 # Couverture et construction
 .coverage
 htmlcov/

@@ -518,14 +518,14 @@ Bronze est visible dans Unity Catalog.
 
 ### Phase 10 — Présentation et remise
 
-- [ ] P10.1 Construire le PowerPoint avec le modèle fourni.
-- [ ] P10.2 Sélectionner uniquement les graphiques utiles.
+- [x] P10.1 Construire le PowerPoint avec le modèle fourni.
+- [x] P10.2 Sélectionner uniquement les graphiques utiles.
 - [ ] P10.3 Préparer une démonstration de moins de deux minutes.
 - [ ] P10.4 Préparer les réponses aux questions probables.
 - [ ] P10.5 Répéter en respectant 15 minutes.
 - [ ] P10.6 Vérifier que tout le code s'exécute.
 - [ ] P10.7 Nettoyer les sorties inutiles des notebooks.
-- [ ] P10.8 Vérifier citations et attribution CC BY 4.0.
+- [x] P10.8 Vérifier citations et attribution CC BY 4.0.
 - [ ] P10.9 Créer l'archive ou la version finale de remise.
 
 **Critère de sortie :** présentation claire, projet exécutable, fichiers complets et étudiant capable de justifier chaque choix.

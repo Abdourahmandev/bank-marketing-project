@@ -230,6 +230,7 @@ bank-marketing-project/
 │   └── raw/bank-additional-full.csv.dvc
 ├── docs/databricks_setup.md
 ├── notebooks/databricks/
+├── presentation/bank_marketing_project_presentation.pptx
 ├── src/bank_marketing/
 │   ├── data_contract.py
 │   ├── modeling.py
@@ -257,8 +258,9 @@ bank-marketing-project/
 - [Plan d'action détaillé](plan_action.md)
 - [Journal de suivi et registre des décisions](SUIVI_PROJET.md)
 - [Configuration Databricks](docs/databricks_setup.md)
+- [Présentation PowerPoint](presentation/bank_marketing_project_presentation.pptx)
 
 ## Prochaine Étape
 
-Préparer le PowerPoint de 15 minutes et la démonstration orale. Le modèle de
-présentation fourni par l'étudiant sera utilisé comme base visuelle.
+Répéter la présentation de 15 minutes, préparer une démonstration Databricks
+courte et vérifier les consignes exactes de remise.
